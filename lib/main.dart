@@ -1,4 +1,5 @@
 import 'package:bracu_core/auth/login.dart';
+import 'package:bracu_core/home/home_screen.dart';
 import 'package:bracu_core/service/pofile_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,7 @@ Future<void> main() async {
   );
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
@@ -36,19 +38,23 @@ Future<void> main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
       ],
-      child: MyApp(),
+      child: MyApp(isLoggedIn: isLoggedIn),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
+  final bool isLoggedIn;
+
+  MyApp({required this.isLoggedIn});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'BRACU Core',
       theme: ThemeData.light(),
-      home: login(),
+      home: isLoggedIn ? HomeScreen() : login(),
     );
   }
 }
