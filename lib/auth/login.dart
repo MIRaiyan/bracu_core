@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:bracu_core/auth/signup.dart';
 import 'package:bracu_core/home/home_screen.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
@@ -24,54 +25,72 @@ class _loginState extends State<login> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  Future<void> handle_login(String email, String password) async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return const Center(
-          child: CircularProgressIndicator(),
+
+  Future<void> handle_login() async {
+    if (_formKey.currentState!.validate()) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      );
+
+      const String uri = "${api_root}/api/auth/login";
+
+      final Map<String, dynamic> requestBody = {
+        "gsuite": _emailController.text.trim(),
+        "password": _passwordController.text.trim(),
+      };
+
+      try {
+        final response = await http.post(
+          Uri.parse(uri),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: jsonEncode(requestBody),
         );
-      },
-    );
-    //Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen())); // for test
 
-    const String uri = "${api_root}/login.php";
-    final body = {
-      'email': email,
-      'password': password,
-    };
-    final response = await http.post(
-      Uri.parse(uri),
-      body: body,
-    );
+        // Close loading dialog
+        if (context.mounted) Navigator.of(context).pop();
 
-    Navigator.of(context).pop();
+        if (kDebugMode) {
+          print(response.body);
+        }
+        if (response.statusCode == 200) {
+          final jsonResponse = json.decode(response.body);
+          // Save jsonResponse in ProfileProvider
+          final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+          await profileProvider.saveProfileData(jsonResponse);
+          await profileProvider.updateLoginStatus(true);
 
-    if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomeScreen(),
+            ),
+          );
 
-      if (jsonResponse['success'] == 'true') {
-        final user = jsonResponse['user'];
-        final String firstName = user['fname'];
-        final String lastName = user['lname'];
-        final String userEmail = user['email'];
-
-        final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
-        Fluttertoast.showToast(msg: "welcome $firstName");
-
-        LogInStatus("None");
-
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
-      } else {
-        Fluttertoast.showToast(msg: "${jsonResponse['message']}");
-        print('Error: ${jsonResponse['message']}');
+        } else if (response.statusCode == 400) {
+          final jsonResponse = json.decode(response.body);
+          Fluttertoast.showToast(msg: "⚠️ Login failed. ${jsonResponse['message']}");
+          if (kDebugMode) {
+            print("Login failed: ${response.statusCode}");
+          }
+        }
+      } catch (error) {
+        if (context.mounted) Navigator.of(context).pop();
+        Fluttertoast.showToast(msg: "🚨 Network error. Please check your connection.");
+        if (kDebugMode) {
+          print("Error: $error");
+        }
       }
-    } else {
-      Fluttertoast.showToast(msg: "Error failed to login");
-      print('Failed to login. Status code: ${response.statusCode}');
     }
   }
+
 
   Future<void> LogInStatus(String userId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -136,13 +155,13 @@ class _loginState extends State<login> {
 
                         CustomInputField(
                           controller: _emailController,
-                          hintText: "Email",
+                          hintText: "gsuite email",
                           icon: Icons.email,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return "Please enter your email";
-                            } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                              return "Please enter a valid email";
+                              return "Please enter your GSuite email";
+                            } else if (!RegExp(r'^[^@]+@g\.bracu\.ac\.bd$').hasMatch(value)) {
+                              return "Please enter a valid GSuite email";
                             }
                             return null;
                           },
@@ -198,7 +217,7 @@ class _loginState extends State<login> {
                                 ),
                                 onPressed: () {
                                   if (_formKey.currentState!.validate()) {
-                                    handle_login(_emailController.text, _passwordController.text);
+                                    handle_login();
                                   }
                                 },
                                 child: const Text(
