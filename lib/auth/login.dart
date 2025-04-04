@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:bracu_core/auth/signup.dart';
+import 'package:bracu_core/home/bottom_navigationbar.dart';
 import 'package:bracu_core/home/home_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -70,7 +71,7 @@ class _loginState extends State<login> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => HomeScreen(),
+              builder: (context) => BottomNavBar(),
             ),
           );
 

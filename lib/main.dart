@@ -1,4 +1,5 @@
 import 'package:bracu_core/auth/login.dart';
+import 'package:bracu_core/home/bottom_navigationbar.dart';
 import 'package:bracu_core/home/home_screen.dart';
 import 'package:bracu_core/service/pofile_provider.dart';
 import 'package:flutter/foundation.dart';
@@ -54,7 +55,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'BRACU Core',
       theme: ThemeData.light(),
-      home: isLoggedIn ? HomeScreen() : login(),
+      home: isLoggedIn ? BottomNavBar() : login(),
     );
   }
 }
