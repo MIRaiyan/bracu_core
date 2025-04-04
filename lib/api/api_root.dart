@@ -1,1 +1,1 @@
-const api_root = "something url kisu hob arki";
+const api_root = "https://bracu-core-backend.vercel.app";
