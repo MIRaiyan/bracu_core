@@ -1,3 +1,6 @@
+import 'package:bracu_core/courses/course.dart';
+import 'package:bracu_core/menu/menu.dart';
+import 'package:bracu_core/profile/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'home_screen.dart';
@@ -13,9 +16,9 @@ class _BottomNavBarState extends State<BottomNavBar> {
 
   final List<Widget> _widgetOptions = [
     HomeScreen(),
-    Search_bar(),
-    Search_bar(),
-    Search_bar(),
+    Menu(),
+    Course(),
+    Profile(),
   ];
 
   void _onTabChange(int index) {
