@@ -1,369 +1,7 @@
-// import 'dart:convert';
-// import 'package:bracu_core/auth/login.dart';
-// import 'package:flutter/material.dart';
-// import 'package:fluttertoast/fluttertoast.dart';
-// import 'package:http/http.dart' as http;
-//
-// import '../api/api_root.dart';
-//
-// class registration extends StatefulWidget {
-//   const registration({super.key});
-//
-//   @override
-//   State<registration> createState() => _registrationState();
-// }
-//
-// class _registrationState extends State<registration> {
-//   final _formKey = GlobalKey<FormState>();
-//   bool passEnable = true;
-//   bool cpassEnable = true;
-//   bool isPasswordcorrect = true;
-//
-//   final TextEditingController _firstNameController = TextEditingController();
-//   final TextEditingController _lastNameController = TextEditingController();
-//   final TextEditingController _emailController = TextEditingController();
-//   final TextEditingController _passwordController = TextEditingController();
-//   final TextEditingController _confirmPasswordController = TextEditingController();
-//
-//   Future<void> insert_record() async {
-//
-//     if (_formKey.currentState!.validate()) {
-//       try {
-//         // make POST request UWU :D
-//         //const String uri = "http://10.0.2.2/learners_api/sign_up.php";
-//         const String uri = "${api_root}/sign_up.php";
-//
-//         var response = await http.post(
-//             Uri.parse(uri),
-//             body: {
-//               "fname": _firstNameController.text,
-//               "lname": _lastNameController.text,
-//               "email": _emailController.text,
-//               "password": _passwordController.text
-//             });
-//
-//         var jsonResponse = jsonDecode(response.body);
-//         if (jsonResponse["success"] == "true") {
-//           Fluttertoast.showToast(msg: "Registration successful");
-//           Fluttertoast.showToast(msg: "Please login");
-//           Navigator.pushReplacement(
-//             context,
-//             MaterialPageRoute(
-//                 builder: (context) => const login()
-//             ),
-//           );
-//           print("Record inserted");
-//         } else {
-//           Fluttertoast.showToast(msg: "${jsonResponse['message']}");
-//           print(jsonResponse);
-//         }
-//       } catch (e) {
-//         print(e);
-//       }
-//     } else {
-//       print("Please fill all fields correctly");
-//     }
-//   }
-//
-//   void _togglePasswordVisibility() {
-//     setState(() {
-//       passEnable = !passEnable;
-//     });
-//   }
-//
-//   void _toggleConfirmPasswordVisibility() {
-//     setState(() {
-//       cpassEnable = !cpassEnable;
-//     });
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       resizeToAvoidBottomInset: true,
-//
-//       body: Container(
-//         height: MediaQuery.of(context).size.height - MediaQuery.of(context).viewInsets.bottom,
-//         width: MediaQuery.of(context).size.width,
-//         decoration: const BoxDecoration(
-//           image: DecorationImage(
-//             image: AssetImage('assets/images/registration.png'),
-//             fit: BoxFit.cover,
-//           ),
-//         ),
-//
-//         child: Center(
-//           child: SingleChildScrollView(
-//             child: Form(
-//               key: _formKey,
-//               child: Column(
-//                 mainAxisSize: MainAxisSize.min,
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 children: [
-//
-//                   const Text(
-//                     "Welcome!",
-//                     style: TextStyle(
-//                       fontSize: 34,
-//                       fontWeight: FontWeight.bold,
-//                       color: Colors.white,
-//                     ),
-//                   ),
-//
-//                   const SizedBox(height: 2),
-//
-//                   const Text(
-//                     "Please Create Your Account",
-//                     style: TextStyle(
-//                       fontSize: 18,
-//                       fontWeight: FontWeight.bold,
-//                       color: Colors.white,
-//                     ),
-//                   ),
-//
-//                   const SizedBox(height: 6),
-//
-//                   Container(
-//                     margin: const EdgeInsets.only(left: 20, right: 20),
-//                     decoration: BoxDecoration(
-//                       borderRadius: BorderRadius.circular(12.0),
-//                       color: Colors.white,
-//                       boxShadow: [
-//                         BoxShadow(
-//                           color: Colors.black.withOpacity(0.2),
-//                           offset: const Offset(0, 4),
-//                           blurRadius: 10,
-//                         ),
-//                       ],
-//                     ),
-//                     child: Column(
-//                       children: [
-//                         Container(
-//                           margin: const EdgeInsets.only(left: 40, right: 40, bottom: 0, top: 40),
-//                           child: Row(
-//                             children: [
-//                               Expanded(
-//                                 child: TextFormField(
-//                                   controller: _firstNameController,
-//                                   decoration: InputDecoration(
-//                                     hintText: 'First Name',
-//                                     border: UnderlineInputBorder(
-//                                       borderSide: BorderSide(
-//                                         color: _firstNameController.text.isNotEmpty
-//                                             ? Colors.red
-//                                             : Colors.amber,
-//                                       ),
-//                                     ),
-//                                     focusedBorder: const UnderlineInputBorder(
-//                                       borderSide: BorderSide(color: Colors.amber),
-//                                     ),
-//                                   ),
-//                                   validator: (value) {
-//                                     if (value == null || value.isEmpty) {
-//                                       return 'Please enter your First Name';
-//                                     } else if (RegExp(r'\d').hasMatch(value)) {
-//                                       return "please enter valid name";
-//                                     }
-//                                     return null;
-//                                   },
-//                                 ),
-//                               ),
-//
-//                               const SizedBox(width: 10.0),
-//
-//                               Expanded(
-//                                 child: TextFormField(
-//                                   controller: _lastNameController,
-//                                   decoration: InputDecoration(
-//                                     hintText: "Last Name",
-//                                     border: UnderlineInputBorder(
-//                                       borderSide: BorderSide(
-//                                         color: _lastNameController.text.isNotEmpty
-//                                             ? Colors.red
-//                                             : Colors.amber,
-//                                       ),
-//                                     ),
-//                                     focusedBorder: const UnderlineInputBorder(
-//                                       borderSide: BorderSide(color: Colors.amber),
-//                                     ),
-//                                   ),
-//                                   validator: (value) {
-//                                     if (value == null || value.isEmpty) {
-//                                       return 'Please enter your Last Name';
-//                                     } else if (RegExp(r'\d').hasMatch(value)) {
-//                                       return "please enter valid name";
-//                                     }
-//                                     return null;
-//                                   },
-//                                 ),
-//                               ),
-//                             ],
-//                           ),
-//                         ),
-//
-//                         Container(
-//                           margin: const EdgeInsets.only(left: 40, right: 40, bottom: 0, top: 0),
-//                           child: TextFormField(
-//                             controller: _emailController,
-//                             keyboardType: TextInputType.emailAddress,
-//                             decoration: const InputDecoration(
-//                               hintText: "Email",
-//                               focusedBorder: UnderlineInputBorder(
-//                                 borderSide: BorderSide(color: Colors.amber),
-//                               ),
-//                             ),
-//                             validator: (value) {
-//                               if (value == null || value.isEmpty) {
-//                                 return 'Please enter your Email';
-//                               } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-//                                 return 'Please enter a valid Email';
-//                               }
-//                               return null;
-//                             },
-//                           ),
-//                         ),
-//                         Container(
-//                           margin: const EdgeInsets.only(left: 40, right: 40, bottom: 0, top: 0),
-//                           child: TextFormField(
-//                             controller: _passwordController,
-//                             obscureText: passEnable,
-//                             decoration: InputDecoration(
-//                               focusedBorder: UnderlineInputBorder(
-//                                 borderSide: BorderSide(
-//                                   color: isPasswordcorrect ? Colors.amber : Colors.red,
-//                                 ),
-//                               ),
-//                               labelStyle: TextStyle(color: Colors.black.withOpacity(0.6)),
-//                               hintText: "Password",
-//                               suffixIcon: IconButton(
-//                                 onPressed: _togglePasswordVisibility,
-//                                 icon: Icon(passEnable
-//                                     ? Icons.visibility_off
-//                                     : Icons.remove_red_eye),
-//                                 color: Colors.black38,
-//                               ),
-//                             ),
-//                             validator: (value) {
-//                               if (value == null || value.isEmpty) {
-//                                 return 'Please enter your Password';
-//                               } else if (value.length < 8) {
-//                                 return 'Password must be at least 8 characters long';
-//                               }
-//                               return null;
-//                             },
-//                           ),
-//                         ),
-//                         Container(
-//                           margin: const EdgeInsets.only(left: 40, right: 40, bottom: 20, top: 0),
-//                           child: TextFormField(
-//                             controller: _confirmPasswordController,
-//                             obscureText: cpassEnable,
-//                             decoration: InputDecoration(
-//                               focusedBorder: UnderlineInputBorder(
-//                                 borderSide: BorderSide(
-//                                   color: isPasswordcorrect ? Colors.amber : Colors.red,
-//                                 ),
-//                               ),
-//                               labelStyle: TextStyle(color: Colors.black.withOpacity(0.6)),
-//                               hintText: "Confirm Password",
-//                               suffixIcon: IconButton(
-//                                 onPressed: _toggleConfirmPasswordVisibility,
-//                                 icon: Icon(cpassEnable
-//                                     ? Icons.visibility_off
-//                                     : Icons.remove_red_eye),
-//                                 color: Colors.black38,
-//                               ),
-//                             ),
-//                             validator: (value) {
-//                               if (value == null || value.isEmpty) {
-//                                 return 'Please confirm your Password';
-//                               } else if (value != _passwordController.text) {
-//                                 return 'Passwords do not match';
-//                               }
-//                               return null;
-//                             },
-//                           ),
-//                         ),
-//                         Center(
-//                           child: SizedBox(
-//                             height: 60,
-//                             width: MediaQuery.of(context).size.width * 0.6,
-//                             child: ElevatedButton(
-//                               style: ElevatedButton.styleFrom(
-//                                 backgroundColor: Colors.amber[800],
-//                                 elevation: 2,
-//                                 shape: RoundedRectangleBorder(
-//                                   borderRadius: BorderRadius.circular(16),
-//                                 ),
-//                                 padding: const EdgeInsets.all(18),
-//                               ),
-//                               onPressed: () {
-//                                 insert_record();
-//                               },
-//                               child: const Text(
-//                                 "Sign Up",
-//                                 style: TextStyle(fontSize: 18, letterSpacing: .4, color: Colors.white),
-//                               ),
-//                             ),
-//                           ),
-//                         ),
-//                         Padding(
-//                           padding: const EdgeInsets.all(10),
-//                           child: Row(
-//                             mainAxisAlignment: MainAxisAlignment.center,
-//                             children: [
-//                               const Text(
-//                                 "Already have an account?",
-//                                 style: TextStyle(
-//                                   letterSpacing: .6,
-//                                   wordSpacing: 2,
-//                                   fontSize: 14,
-//                                 ),
-//                               ),
-//                               TextButton(
-//                                 onPressed: () {
-//                                   Navigator.pushReplacement(
-//                                     context,
-//                                     MaterialPageRoute(builder: (context) => login()),
-//                                   );
-//                                 },
-//                                 child: const Text(
-//                                   'Sign In',
-//                                   style: TextStyle(
-//                                     color: Colors.orange,
-//                                     letterSpacing: 1,
-//                                     fontWeight: FontWeight.bold,
-//                                   ),
-//                                 ),
-//                               ),
-//                             ],
-//                           ),
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-
-
-
-
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../api/api_root.dart';
-import '../service/pofile_provider.dart';
 import '../widgets/custom_input_field.dart';
 import 'login.dart';
 import 'package:http/http.dart' as http;
@@ -376,7 +14,8 @@ class Registration extends StatefulWidget {
 }
 
 class _RegistrationState extends State<Registration> {
-  final _formKey = GlobalKey<FormState>();
+  final _formKey1 = GlobalKey<FormState>();
+  final _formKey2 = GlobalKey<FormState>();
   final PageController _pageController = PageController();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -384,10 +23,13 @@ class _RegistrationState extends State<Registration> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _studentIdController = TextEditingController();
   final TextEditingController _departmentController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   String _selectedGender = 'Male';
+  bool passEnable = true;
+
 
   Future<void> handle_registration() async {
-    if (_formKey.currentState!.validate()) {
+    if (_formKey1.currentState!.validate() && _formKey2.currentState!.validate()) {
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -399,38 +41,99 @@ class _RegistrationState extends State<Registration> {
       );
 
       const String uri = "${api_root}/register.php";
-      final body = {
-        'first_name': _firstNameController.text,
-        'last_name': _lastNameController.text,
-        'gsuite': _gsuiteController.text,
-        'phone': _phoneController.text,
-        'student_id': _studentIdController.text,
-        'department': _departmentController.text,
-        'gender': _selectedGender,
+
+      final Map<String, dynamic> requestBody = {
+        "firstName": _firstNameController.text.trim(),
+        "lastName": _lastNameController.text.trim(),
+        "gsuite": _gsuiteController.text.trim(),
+        "phoneNumber": _phoneController.text.trim(),
+        "studentId": _studentIdController.text.trim(),
+        "department": _departmentController.text.trim(),
+        "gender": _selectedGender,
+        "password": _passwordController.text,
+        "admission_year": null,
+        "profilePicture": "https://decisionsystemsgroup.github.io/workshop-html/img/john-doe.jpg",
+        "bio": null,
+        "currentAddress": null,
+        "permanentAddress": null,
+        "bloodGroup": null,
+        "emergencyContact": {
+          "name": null,
+          "relation": null,
+          "phoneNumber": null,
+        },
+        "cgpa": double.parse("0.0"),
+        "completedCredits": int.parse("0"),
+        "totalCredits": int.parse("0"),
+        "role": "Student",
+        "accountVerified": false,
+        "studentIdImages": {
+          "front": "https://i.fbcd.co/products/resized/resized-750-500/44-32586d03d0647878c6ef48e35b1c7f313f5551d92b0b3fbb1c920f18f3d2ecef.jpg",
+          "back": "https://i.fbcd.co/products/resized/resized-750-500/44-32586d03d0647878c6ef48e35b1c7f313f5551d92b0b3fbb1c920f18f3d2ecef.jpg",
+        },
+        "clubMemberships": [null],
+        "ongoingCourses": [
+          {
+            "courseCode": null,
+            "courseTitle": null,
+            "section": null,
+            "faculty": null
+          },
+          {
+            "courseCode": null,
+            "courseTitle": null,
+            "section": null,
+            "faculty": null,
+          },
+        ],
+        "registeredDevices": [null],
+        "lastLogin": DateTime.now().toIso8601String(),
       };
-      final response = await http.post(
-        Uri.parse(uri),
-        body: body,
-      );
 
-      Navigator.of(context).pop();
+      try {
+        final response = await http.post(
+          Uri.parse(uri),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: jsonEncode(requestBody),
+        );
 
-      if (response.statusCode == 200) {
-        final jsonResponse = json.decode(response.body);
+        // Close loading dialog
+        if (context.mounted) Navigator.of(context).pop();
 
-        if (jsonResponse['success'] == 'true') {
-          Fluttertoast.showToast(msg: "Registration successful");
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const login()));
+        if (response.statusCode == 200) {
+          final jsonResponse = json.decode(response.body);
+
+          if (jsonResponse['success'] == 'true') {
+            Fluttertoast.showToast(msg: "✅ Registration successful");
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const login()),
+            );
+          } else {
+            Fluttertoast.showToast(msg: "❌ ${jsonResponse['message']}");
+            print("Error: ${jsonResponse['message']}");
+          }
         } else {
-          Fluttertoast.showToast(msg: "${jsonResponse['message']}");
-          print('Error: ${jsonResponse['message']}');
+          Fluttertoast.showToast(msg: "⚠️ Failed to register. Try again.");
+          print("Failed to register. Status code: ${response.statusCode}");
         }
-      } else {
-        Fluttertoast.showToast(msg: "Error failed to register");
-        print('Failed to register. Status code: ${response.statusCode}');
+      } catch (error) {
+        // Close loading dialog if error occurs
+        if (context.mounted) Navigator.of(context).pop();
+        Fluttertoast.showToast(msg: "🚨 Network error. Please check your connection.");
+        print("Exception: $error");
       }
     }
   }
+
+  void _togglePasswordVisibility() {
+    setState(() {
+      passEnable = !passEnable;
+    });
+  }
+
 
 
 
@@ -462,7 +165,7 @@ class _RegistrationState extends State<Registration> {
     return SingleChildScrollView(
       child: Center(
         child: Form(
-          key: _formKey,
+          key: _formKey1,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -551,7 +254,7 @@ class _RegistrationState extends State<Registration> {
                               padding: const EdgeInsets.all(18),
                             ),
                             onPressed: () {
-                              if (_formKey.currentState!.validate()) {
+                              if (_formKey1.currentState!.validate()) {
                                 _pageController.nextPage(
                                   duration: const Duration(milliseconds: 300),
                                   curve: Curves.easeInOut,
@@ -585,7 +288,7 @@ class _RegistrationState extends State<Registration> {
     return SingleChildScrollView(
       child: Center(
         child: Form(
-          key: _formKey,
+          key: _formKey2,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -651,6 +354,22 @@ class _RegistrationState extends State<Registration> {
                         labelText: 'Gender',
                         prefixIcon: Icon(Icons.person),
                       ),
+                    ),
+                    CustomInputField(
+                      controller: _passwordController,
+                      hintText: "Password",
+                      icon: Icons.lock,
+                      isPassword: true,
+                      isPasswordVisible: !passEnable,
+                      onTogglePasswordVisibility: _togglePasswordVisibility,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Please enter your password";
+                        } else if (value.length < 8) {
+                          return "Password must be at least 8 characters long";
+                        }
+                        return null;
+                      },
                     ),
                     Center(
                       child: Container(
