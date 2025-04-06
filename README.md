@@ -1,16 +1,42 @@
-# bracu_core
+# Bracu Core: Mobile app for bracu
+![](https://raw.githubusercontent.com/Onnesok/bracu_core/refs/heads/main/assets/logo/bracu_core.png)
 
-CSE471 group project....
+**Bracu Core** Bracu core is our cse471 project which is basically the improved version of Brac University's lost mobile app.
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+## 🛠️ **Tech Stack**
+- **Frontend**: Flutter
+- **Backend**: Node.js, Express.js
+- **Database**: MongoDB Atlas
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 🗃️ **Backend** :
+
+[Backend Here](https://github.com/Onnesok/bracu_core_backend)
+
+
+For updated file structure use ``gitingest``
+
+
+## 🚀 **How to Get Started**
+
+**Fork**
+
+First ``Fork`` the repository... Then clone the repository from your profile where you forked it...
+
+**For cloning**
+   ```bash
+   git clone https://github.com/Onnesok/bracu_core.git
+   cd bracu_core
+   ```
+**env setup**
+
+Setup an ``env`` file to store sectrets.....
+
+Install dependencies and run :
+```bash
+flutter pub get
+flutter run
+```
