@@ -47,7 +47,9 @@ class Profile extends StatelessWidget {
         Center(
           child: CircleAvatar(
             radius: 50,
-            backgroundImage: NetworkImage(profileProvider.profilePicture),
+            backgroundImage: NetworkImage(profileProvider.profilePicture?.isNotEmpty == true
+                ? profileProvider.profilePicture!
+                : 'https://decisionsystemsgroup.github.io/workshop-html/img/john-doe.jpg'),
           ),
         ),
         SizedBox(height: 20),
