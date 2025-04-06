@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -28,6 +29,7 @@ class ProfileProvider with ChangeNotifier {
   List<Map<String, dynamic>> _ongoingCourses = [];
   List<String> _registeredDevices = [];
   String _lastLogin = '';
+  String _authToken = '';
 
   bool _isLoggedIn = false;
 
@@ -57,6 +59,7 @@ class ProfileProvider with ChangeNotifier {
   List<Map<String, dynamic>> get ongoingCourses => _ongoingCourses;
   List<String> get registeredDevices => _registeredDevices;
   String get lastLogin => _lastLogin;
+  String get authToken => _authToken;
 
   bool get isLoggedIn => _isLoggedIn;
 
@@ -100,6 +103,7 @@ class ProfileProvider with ChangeNotifier {
         _ongoingCourses = List<Map<String, dynamic>>.from(data['ongoingCourses'] ?? []);
         _registeredDevices = List<String>.from(data['registeredDevices'] ?? []);
         _lastLogin = data['lastLogin'] ?? '';
+        _authToken = prefs.getString('token') ?? '';
 
         // Load login status
         _isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
@@ -164,6 +168,33 @@ class ProfileProvider with ChangeNotifier {
     }
   }
 
+  /// Save auth token
+  Future<void> saveAuthToken(String token) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      _authToken = token;
+      await prefs.setString('token', token);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error saving auth token: $e');
+    }
+  }
+
+  /// Load auth token from SharedPreferences and return it
+  Future<String> loadAuthToken() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      _authToken = prefs.getString('token') ?? '';
+      notifyListeners();
+      return _authToken;
+    } catch (e) {
+      if(kDebugMode) {
+        debugPrint('Error loading auth token: $e');
+      }
+      return '';
+    }
+  }
+
   /// Clear profile and authentication data
   Future<void> clearProfile() async {
     try {
@@ -173,6 +204,7 @@ class ProfileProvider with ChangeNotifier {
       await prefs.remove('access_token');
       await prefs.remove('refresh_token');
       await prefs.remove('isLoggedIn');
+      await prefs.remove('token');
 
       _firstName = '';
       _lastName = '';
@@ -199,6 +231,7 @@ class ProfileProvider with ChangeNotifier {
       _ongoingCourses = [];
       _registeredDevices = [];
       _lastLogin = '';
+      _authToken = '';
 
       _isLoggedIn = false;
 
