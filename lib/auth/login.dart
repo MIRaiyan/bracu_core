@@ -66,6 +66,7 @@ class _loginState extends State<login> {
           // Save jsonResponse in ProfileProvider
           final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
           await profileProvider.saveProfileData(jsonResponse);
+          await profileProvider.saveAuthToken(jsonResponse['token']);
           await profileProvider.updateLoginStatus(true);
 
           Navigator.pushReplacement(
