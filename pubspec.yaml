@@ -47,6 +47,10 @@ dependencies:
   intl: ^0.20.2
   animations: ^2.0.11
   google_nav_bar: ^5.0.7
+  lottie: ^3.2.0
+  location: ^7.0.1
+  geocoding: ^3.0.0
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:
@@ -74,6 +78,7 @@ flutter:
     - assets/logo/
     - assets/ui/
     - assets/Icon/
+    - assets/animation/
     - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see
