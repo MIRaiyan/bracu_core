@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:location/location.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../api/api_root.dart';
-import '../service/pofile_provider.dart';
+import '../service/profile_provider.dart';
 import 'searchbar.dart';
 import 'package:animations/animations.dart';
 import 'package:intl/intl.dart';
