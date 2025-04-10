@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../profile/profile.dart';
+import '../profile/update.dart';
 
 class ProfileProvider with ChangeNotifier {
   String _firstName = '';
@@ -60,6 +63,11 @@ class ProfileProvider with ChangeNotifier {
   List<String> get registeredDevices => _registeredDevices;
   String get lastLogin => _lastLogin;
   String get authToken => _authToken;
+
+  String get emergencyName => _emergencyContact['name'] ?? '';
+  String get emergencyRelation => _emergencyContact['relation'] ?? '';
+  String get emergencyPhoneNumber => _emergencyContact['phoneNumber'] ?? '';
+
 
   bool get isLoggedIn => _isLoggedIn;
 
@@ -276,6 +284,75 @@ class ProfileProvider with ChangeNotifier {
       }
     } catch (e) {
       debugPrint('Error updating address: $e');
+    }
+  }
+
+  Future<bool> updateProfile({
+    required String studentId,
+    required String phoneNumber,
+    required String department,
+    required String permanentAddress,
+    required String currentAddress,
+    required Map<String, String> emergencyContact,
+  }) async {
+    try {
+      // Prepare API URL and token
+      final url = Uri.parse('https://bracu-core-backend.vercel.app/api/user/update'); //endpoint
+      final prefs = await SharedPreferences.getInstance();
+      final token = await loadAuthToken(); // JWT token
+
+      if (token == null) {
+        throw Exception("JWT token not found");
+      }
+
+      // Send PUT request to backend
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token,
+        },
+        body: jsonEncode({
+          'studentId': studentId,
+          'phoneNumber': phoneNumber,
+          'department': department,
+          'permanentAddress': permanentAddress,
+          'currentAddress': currentAddress,
+          'emergencyContact': emergencyContact,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        // Update local variables only if backend call is successful
+        _studentId = studentId;
+        _phoneNumber = phoneNumber;
+        _department = department;
+        _permanentAddress = permanentAddress;
+        _currentAddress = currentAddress;
+        _emergencyContact = emergencyContact;
+
+        // Update SharedPreferences
+        final String? profileData = prefs.getString('profile_data');
+        Map<String, dynamic> data = profileData != null ? jsonDecode(profileData) : {};
+
+        data['studentId'] = studentId;
+        data['phoneNumber'] = phoneNumber;
+        data['department'] = department;
+        data['permanentAddress'] = permanentAddress;
+        data['currentAddress'] = currentAddress;
+        data['emergencyContact'] = emergencyContact;
+
+        await prefs.setString('profile_data', jsonEncode(data));
+
+        notifyListeners();
+        return true;
+      } else {
+        debugPrint('Backend error: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      debugPrint('Error updating profile: $e');
+      return false;
     }
   }
 }

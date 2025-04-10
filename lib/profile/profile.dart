@@ -1,7 +1,8 @@
 import 'package:bracu_core/auth/login.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../service/pofile_provider.dart';
+import '../service/profile_provider.dart';
+import 'update.dart';
 
 class Profile extends StatelessWidget {
   const Profile({super.key});
@@ -32,7 +33,7 @@ class Profile extends StatelessWidget {
           children: [
             _buildProfileHeader(profileProvider),
             SizedBox(height: 20),
-            _buildGridOptions(),
+            _buildGridOptions(context, profileProvider),
             SizedBox(height: 20),
             _buildAppSettings(context),
           ],
@@ -63,7 +64,7 @@ class Profile extends StatelessWidget {
     );
   }
 
-  Widget _buildGridOptions() {
+  Widget _buildGridOptions(BuildContext context, ProfileProvider profileProvider) {
     List<String> options = ['Update Profile', 'Change Password', 'Location Setting'];
     List<IconData> icons = [Icons.person_outline, Icons.lock_outline, Icons.location_on_outlined];
 
@@ -83,7 +84,23 @@ class Profile extends StatelessWidget {
           itemBuilder: (context, index) {
             return GestureDetector(
               onTap: () {
-                // Handle tap
+                if (options[index] == 'Update Profile') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UpdateProfilePage(
+                        studentId: profileProvider.studentId,
+                        phoneNumber: profileProvider.phoneNumber,
+                        department: profileProvider.department,
+                        permanentAddress: profileProvider.permanentAddress,
+                        presentAddress: profileProvider.currentAddress,
+                        emergencyContactName: profileProvider.emergencyName,
+                        emergencyContactRelation: profileProvider.emergencyRelation,
+                        emergencyContactPhoneNumber: profileProvider.emergencyPhoneNumber,
+                      ),
+                    ),
+                  );
+                }
               },
               child: Card(
                 color: Colors.white.withOpacity(0.9),
