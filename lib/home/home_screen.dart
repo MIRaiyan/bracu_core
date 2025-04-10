@@ -1,9 +1,19 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:ui';
+import 'package:bracu_core/home/notificationPage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:location/location.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../api/api_root.dart';
 import '../service/pofile_provider.dart';
-import 'package:animations/animations.dart';
 import 'searchbar.dart';
+import 'package:animations/animations.dart';
+import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -11,13 +21,106 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  Timer? _timer;
   DateTime selectedDate = DateTime.now();
   bool isExpanded = false;
+  bool isRefreshing = false;
+  String location = 'Fetching location...';
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchLocation();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _fetchLocation() async {
+    Location locationService = Location();
+    bool serviceEnabled;
+    PermissionStatus permissionGranted;
+
+    serviceEnabled = await locationService.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await locationService.requestService();
+      if (!serviceEnabled) {
+        setState(() {
+          location = 'Location services are disabled.';
+        });
+        return;
+      }
+    }
+
+    permissionGranted = await locationService.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await locationService.requestPermission();
+      if (permissionGranted != PermissionStatus.granted) {
+        setState(() {
+          location = 'Location permissions are denied';
+        });
+        return;
+      }
+    }
+
+    LocationData locationData = await locationService.getLocation();
+    setState(() {
+      location = '${locationData.latitude}, ${locationData.longitude}';
+    });
+  }
+
+  Future<void> _refresh() async {
+    setState(() {
+      isRefreshing = true;
+    });
+    try {
+      final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+      final authToken = await profileProvider.loadAuthToken();
+
+      final response = await http.get(
+        Uri.parse('${api_root}/api/user/profile'),
+        headers: {
+          'Authorization': authToken,
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (kDebugMode) {
+        print(response.body);
+        print(response.statusCode);
+      }
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        await profileProvider.saveProfileData(data);
+      } else {
+        throw Exception('Failed to load profile data');
+      }
+    } catch (e) {
+      debugPrint('Error refreshing profile data: $e');
+    } finally {
+      setState(() {
+        isRefreshing = false;
+      });
+    }
+  }
 
   void _changeDate(int days) {
     setState(() {
       selectedDate = selectedDate.add(Duration(days: days));
     });
+  }
+
+  Future<void> LaunchUrl(Uri url) async {
+    if (!await launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
+    )) {
+      throw Exception('Could not launch $url');
+    }
   }
 
   @override
@@ -32,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
         toolbarHeight: 100.0,
         flexibleSpace: SafeArea(
           child: Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -46,11 +149,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             : 'https://decisionsystemsgroup.github.io/workshop-html/img/john-doe.jpg',
                       ),
                     ),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Hi !', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.orange)),
+                        const Text('Hi !', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.orange)),
                         Text('${profileProvider.firstName ?? ''} ${profileProvider.lastName ?? ''}', style: TextStyle(fontSize: 16)),
                       ],
                     ),
@@ -63,18 +166,44 @@ class _HomeScreenState extends State<HomeScreen> {
                       closedElevation: 0,
                       transitionDuration: const Duration(milliseconds: 500),
                       closedBuilder: (ctx, action) => Container(
-                        width: 50,
+                        width: 40,
                         height: 40,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Icon(Icons.search, color: Colors.black),
+                        child: Lottie.asset(
+                          'assets/animation/search.json',
+                          width: 60,
+                          height: 60,
+                          fit: BoxFit.cover,
+                          repeat: true,
+                        ),
                       ),
                       openBuilder: (ctx, action) => Search_bar(),
                     ),
-                    SizedBox(width: 10),
-                    Icon(Icons.notifications, color: Colors.black),
+                    const SizedBox(width: 10),
+                    OpenContainer(
+                      closedColor: Colors.white,
+                      closedElevation: 0,
+                      transitionDuration: const Duration(milliseconds: 500),
+                      closedBuilder: (ctx, action) => Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Lottie.asset(
+                          'assets/animation/notification3.json',
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                          repeat: false,
+                        ),
+                      ),
+                      openBuilder: (ctx, action) => const Notificationpage(),
+                    ),
                   ],
                 ),
               ],
@@ -82,15 +211,20 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildDateSelector(),
-            _buildCourseSchedule(profileProvider),
-            _buildOtherFeatures(),
-            _buildTrendingCourses(),
-          ],
+      body: RefreshIndicator(
+        onRefresh: _refresh,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildDateSelector(),
+              _buildCourseSchedule(profileProvider),
+              _buildOtherFeatures(),
+              //_buildTrendingCourses(),
+              _buildLocationDetails(),
+            ],
+          ),
         ),
       ),
     );
@@ -116,7 +250,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildCourseSchedule(ProfileProvider profileProvider) {
     List ongoingCourses = profileProvider.ongoingCourses;
 
-    // Filter courses based on the selected day
     List visibleCourses = ongoingCourses.where((course) {
       List<String> days = List<String>.from(course["days"] ?? []);
       String selectedDay = DateFormat('EEEE').format(selectedDate);
@@ -126,21 +259,36 @@ class _HomeScreenState extends State<HomeScreen> {
     if (visibleCourses.isEmpty) {
       return Padding(
         padding: EdgeInsets.all(16.0),
-        child: Center(child: Text('No classes today', style: TextStyle(fontSize: 16))),
+        child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Lottie.asset(
+                  'assets/animation/ghost.json',
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.cover,
+                  repeat: true,
+                ),
+                const Text("No Classes Today"),
+              ],
+            ),
+        ),
       );
     }
 
     List displayedCourses = isExpanded ? visibleCourses : visibleCourses.take(2).toList();
 
     return Padding(
-      padding: EdgeInsets.all(16.0),
+      padding: EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ...displayedCourses.map((course) {
             return _courseTile(course["courseCode"] ?? '', course["room"] ?? '', course["time"] ?? '', course["faculty"] ?? '', course["section"] ?? '');
           }).toList(),
-          if (visibleCourses.length > 1)
+          if (visibleCourses.length >= 1)
             TextButton(
               onPressed: () {
                 setState(() {
@@ -158,6 +306,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
   Widget _courseTile(String course, String room, String time, String faculty, String section) {
     List<String> timeParts = time.split('-');
     String hours = timeParts.length > 0 ? timeParts[0] : '';
@@ -276,7 +425,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildOtherFeatures() {
     return Padding(
-      padding: EdgeInsets.all(16),
+      padding: EdgeInsets.only(left: 16.0, top: 16, right: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -319,17 +468,88 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildTrendingCourses() {
+  Widget _buildLocationDetails() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Trending Courses", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0, top: 16),
+          child: Text('Location & Safety', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        ),
         Container(
-          color: Colors.white10,
-          height: 200,
-          width: double.infinity,
-          child: Center(child: Text("Course placeholder")),
-        )
+          margin: EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey, width: 1),
+            borderRadius: BorderRadius.circular(10),
+            image: DecorationImage(
+              image: AssetImage('assets/ui/map.png'),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.location_on, color: Colors.red),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      "Your Location: $location",
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black87),
+                    ),
+                  ),
+                  GestureDetector(
+                    child: Lottie.asset(
+                      'assets/animation/maps.json',
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.cover,
+                      repeat: false,
+                    ),
+                    onTap: () async {
+                      final locationData = location.split(':').last.trim();
+                      final url = Uri.parse('https://www.google.com/maps/search/?api=1&query=$locationData');
+                      LaunchUrl(url);
+                    },
+                  ),
+                ],
+              ),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.5,
+                    margin: EdgeInsets.symmetric(vertical: 8),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Soon to be implemented'),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white, backgroundColor: Colors.teal, // Text color
+                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // Rounded corners
+                        ),
+                        elevation: 5, // Elevation
+                      ),
+                      child: Text(
+                        '⚠️ Send SOS',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    )
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
       ],
     );
   }
