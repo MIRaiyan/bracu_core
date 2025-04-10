@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../api/api_root.dart';
-import '../service/pofile_provider.dart';
+import '../service/profile_provider.dart';
 import '../widgets/custom_input_field.dart';
 
 class login extends StatefulWidget {
