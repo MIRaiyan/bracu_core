@@ -33,7 +33,7 @@ First ``Fork`` the repository... Then clone the repository from your profile whe
    ```
 **env setup**
 
-Setup an ``env`` file to store sectrets.....
+Setup an ``env`` file to store secrets.....
 
 Install dependencies and run :
 ```bash
