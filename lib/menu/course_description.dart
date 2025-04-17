@@ -1,152 +1,92 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const CGPACalculatorApp());
+  runApp(CourseApp());
 }
 
-class CGPACalculatorApp extends StatelessWidget {
-  const CGPACalculatorApp({super.key});
-
+class CourseApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'CGPA Calculator',
+      title: 'Course List',
       theme: ThemeData(
         primarySwatch: Colors.orange,
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: const CGPACalculatorScreen(),
+      home: CourseListPage(),
     );
   }
 }
 
-class CGPACalculatorScreen extends StatefulWidget {
-  const CGPACalculatorScreen({super.key});
+class Course {
+  final String title;
+  final String description;
 
-  @override
-  _CGPACalculatorScreenState createState() => _CGPACalculatorScreenState();
+  Course({required this.title, required this.description});
 }
 
-class _CGPACalculatorScreenState extends State<CGPACalculatorScreen> {
-  final TextEditingController _currentCgpaController = TextEditingController();
-  final TextEditingController _coursesCompletedController =
-  TextEditingController();
-  final List<TextEditingController> _courseGpaControllers = List.generate(
-    5,
-        (index) => TextEditingController(),
-  );
+final List<Course> courses = [
+  Course(title: 'CSE101: Intro to Programming', description: 'Basics of programming in Python, logic building and algorithms.'),
+  Course(title: 'CSE220: Data Structures', description: 'Covers arrays, linked lists, stacks, queues, trees, and graphs.'),
+  Course(title: 'MATH110: Calculus I', description: 'Differential and integral calculus with applications.'),
+  Course(title: 'MATH216: Linear Algebra', description: 'Matrix operations, vector spaces, and eigenvalues.'),
+  Course(title: 'ENG101: English Composition', description: 'Basics of academic writing, grammar, and structure.'),
+  Course(title: 'ENG103: Technical Writing', description: 'Professional communication and technical documentation skills.')
+];
 
-  double? _calculatedCgpa;
-
-  void _calculateCgpa() {
-    final currentCgpa = double.tryParse(_currentCgpaController.text) ?? 0.0;
-    final coursesCompleted =
-        int.tryParse(_coursesCompletedController.text) ?? 0;
-
-    double totalPoint = currentCgpa * coursesCompleted;
-    int validCourses = 0;
-
-    for (var controller in _courseGpaControllers) {
-      if (controller.text.isNotEmpty) {
-        totalPoint += double.tryParse(controller.text) ?? 0.0;
-        validCourses++;
-      }
-    }
-
-    if (validCourses >= 3) {
-      final cgpa = totalPoint / (coursesCompleted + validCourses);
-      setState(() {
-        _calculatedCgpa = double.parse(cgpa.toStringAsFixed(2));
-      });
-    } else {
-      setState(() {
-        _calculatedCgpa = null;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter at least 3 course GPAs.'),
-        ),
-      );
-    }
+class CourseListPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Courses'),
+        backgroundColor: Colors.orange,
+      ),
+      body: ListView.builder(
+        itemCount: courses.length,
+        itemBuilder: (context, index) {
+          return Card(
+            margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            color: Colors.orange.shade50,
+            child: ListTile(
+              title: Text(
+                courses[index].title,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              trailing: Icon(Icons.arrow_forward_ios, color: Colors.orange),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CourseDescriptionPage(course: courses[index]),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      ),
+    );
   }
+}
+
+class CourseDescriptionPage extends StatelessWidget {
+  final Course course;
+
+  CourseDescriptionPage({required this.course});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('CGPA Calculator'),
+        title: Text(course.title),
         backgroundColor: Colors.orange,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Enter your current CGPA:',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              TextField(
-                controller: _currentCgpaController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  hintText: 'e.g., 3.50',
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Enter the number of courses completed:',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              TextField(
-                controller: _coursesCompletedController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  hintText: 'e.g., 30',
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Enter GPAs for up to 5 courses:',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              for (int i = 0; i < 5; i++)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
-                  child: TextField(
-                    controller: _courseGpaControllers[i],
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      hintText: 'Course ${i + 1} GPA',
-                    ),
-                  ),
-                ),
-              const SizedBox(height: 16),
-              Center(
-                child: ElevatedButton(
-                  onPressed: _calculateCgpa,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                  ),
-                  child: const Text('Calculate CGPA'),
-                ),
-              ),
-              const SizedBox(height: 16),
-              if (_calculatedCgpa != null)
-                Center(
-                  child: Text(
-                    'Your CGPA is: $_calculatedCgpa',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.orange,
-                    ),
-                  ),
-                ),
-            ],
-          ),
+        padding: EdgeInsets.all(16.0),
+        child: Text(
+          course.description,
+          style: TextStyle(fontSize: 18),
         ),
       ),
     );
