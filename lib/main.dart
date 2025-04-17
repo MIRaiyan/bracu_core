@@ -34,6 +34,8 @@ Future<void> main() async {
     systemNavigationBarIconBrightness: Brightness.dark,
   ));
 
+  await dotenv.load(fileName: ".env");
+
   runApp(
     MultiProvider(
       providers: [
