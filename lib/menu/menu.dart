@@ -5,13 +5,38 @@ class Menu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text('Menu'),
+        backgroundColor: Colors.white,
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              _buildGridView(),
+              const SizedBox(height: 20),
+              _buildTrendingCourses(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGridView() {
     final List<String> options = [
       'CGPA Calculator',
       'Thesis Finder',
       'AI Assistant',
       'Trending Courses',
       'Faculty Information',
-      'Other'
+      'Emergency Contacts',
+      'Routine Generator',
+      'St Schedule',
+      'Faculty Consultation'
     ];
     final List<IconData> icons = [
       Icons.calculate,
@@ -19,34 +44,30 @@ class Menu extends StatelessWidget {
       Icons.smart_toy,
       Icons.trending_up,
       Icons.info,
-      Icons.more_horiz
+      Icons.phone,
+      Icons.schedule,
+      Icons.bookmark_add_outlined,
+      Icons.bookmark_add_outlined
     ];
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Menu'),
-        backgroundColor: Colors.white,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: GridView.builder(
-          itemCount: options.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            childAspectRatio: 0.8,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-          ),
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                // Handle tap
-              },
-              child: _buildCard(options[index], icons[index]),
-            );
-          },
+    return SizedBox(
+      height: 300, // Adjust the height as needed
+      child: GridView.builder(
+        itemCount: options.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          childAspectRatio: 0.8,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
         ),
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () {
+              // Handle tap
+            },
+            child: _buildCard(options[index], icons[index]),
+          );
+        },
       ),
     );
   }
@@ -73,6 +94,21 @@ class Menu extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTrendingCourses() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Trending Courses", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Container(
+          color: Colors.white10,
+          height: 200,
+          width: double.infinity,
+          child: Center(child: Text("Course placeholder")),
+        )
+      ],
     );
   }
 }

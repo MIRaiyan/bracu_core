@@ -1,4 +1,5 @@
 import 'package:bracu_core/auth/login.dart';
+import 'package:bracu_core/profile/feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../service/profile_provider.dart';
@@ -6,6 +7,10 @@ import 'update.dart';
 
 class Profile extends StatelessWidget {
   const Profile({super.key});
+
+  void _navigateTo(BuildContext context, Widget route) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => route));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +30,6 @@ class Profile extends StatelessWidget {
         backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
       ),
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -35,7 +39,7 @@ class Profile extends StatelessWidget {
             SizedBox(height: 20),
             _buildGridOptions(context, profileProvider),
             SizedBox(height: 20),
-            _buildAppSettings(context),
+            _buildAppSettings(context, profileProvider),
           ],
         ),
       ),
@@ -127,7 +131,7 @@ class Profile extends StatelessWidget {
     );
   }
 
-  Widget _buildAppSettings(BuildContext context) {
+  Widget _buildAppSettings(BuildContext context, ProfileProvider profileProvider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -137,20 +141,22 @@ class Profile extends StatelessWidget {
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
           children: [
-            _buildListTile(Icons.notifications_none_outlined, 'Notification Setting', Colors.black, context),
-            _buildListTile(Icons.star_border_outlined, 'Rate App', Colors.black, context),
-            _buildListTile(Icons.feedback_outlined, 'Feedback', Colors.black, context),
-            _buildListTile(Icons.share_outlined, 'Invite', Colors.black, context),
-            _buildListTile(Icons.help_outline, 'Help', Colors.black, context),
-            _buildListTile(Icons.privacy_tip_outlined, 'Privacy Policy', Colors.black, context),
-            _buildListTile(Icons.logout_outlined, 'Logout', Colors.red, context),
+            _buildListTile(Icons.notifications_none_outlined, 'Notification Setting', Colors.black, context, null),
+            _buildListTile(Icons.star_border_outlined, 'Rate App', Colors.black, context, RatingPage()),
+            if (profileProvider.role == 'Admin')
+              _buildListTile(Icons.admin_panel_settings_outlined, 'Admin Panel', Colors.red, context, null),
+            _buildListTile(Icons.feedback_outlined, 'Feedback', Colors.black, context, null),
+            _buildListTile(Icons.share_outlined, 'Invite', Colors.black, context, null),
+            _buildListTile(Icons.help_outline, 'Help', Colors.black, context, null),
+            _buildListTile(Icons.privacy_tip_outlined, 'Privacy Policy', Colors.black, context, null),
+            _buildListTile(Icons.logout_outlined, 'Logout', Colors.red, context, null),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildListTile(IconData icon, String title, Color iconColor, BuildContext context) {
+  Widget _buildListTile(IconData icon, String title, Color iconColor, BuildContext context, Widget? route) {
     return Card(
       color: Colors.white,
       margin: EdgeInsets.symmetric(vertical: 2),
@@ -163,8 +169,8 @@ class Profile extends StatelessWidget {
         onTap: () {
           if (title == 'Logout') {
             _showLogoutDialog(context);
-          } else {
-            // Handle other taps
+          } else if (route != null) {
+            _navigateTo(context, route);
           }
         },
       ),
