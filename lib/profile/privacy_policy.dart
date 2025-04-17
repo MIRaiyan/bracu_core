@@ -55,4 +55,5 @@ class PrivacyPolicyScreen extends StatelessWidget {
       ),
     );
   }
-}
+} 
+//ami banaisi
