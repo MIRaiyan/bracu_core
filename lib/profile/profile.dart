@@ -1,6 +1,7 @@
 import 'package:bracu_core/auth/login.dart';
 import 'package:bracu_core/menu/ai_assistant.dart';
 import 'package:bracu_core/profile/feedback.dart';
+import 'package:bracu_core/profile/privacy_policy.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../service/profile_provider.dart';
@@ -149,7 +150,7 @@ class Profile extends StatelessWidget {
             _buildListTile(Icons.feedback_outlined, 'AI', Colors.black, context, AIAssistantScreen()),
             _buildListTile(Icons.share_outlined, 'Invite', Colors.black, context, null),
             _buildListTile(Icons.help_outline, 'Help', Colors.black, context, null),
-            _buildListTile(Icons.privacy_tip_outlined, 'Privacy Policy', Colors.black, context, null),
+            _buildListTile(Icons.privacy_tip_outlined, 'Privacy Policy', Colors.black, context, PrivacyPolicyScreen()),
             _buildListTile(Icons.logout_outlined, 'Logout', Colors.red, context, null),
           ],
         ),
