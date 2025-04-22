@@ -5,6 +5,7 @@ import 'package:bracu_core/profile/feedback.dart';
 import 'package:bracu_core/profile/privacy_policy.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../menu/faculty_consultation.dart';
 import '../service/profile_provider.dart';
 import 'update.dart';
 
@@ -148,9 +149,9 @@ class Profile extends StatelessWidget {
             _buildListTile(Icons.star_border_outlined, 'Rate App', Colors.black, context, RatingPage()),
             if (profileProvider.role == 'Admin')
               _buildListTile(Icons.admin_panel_settings_outlined, 'Admin Panel', Colors.red, context, null),
-            _buildListTile(Icons.feedback_outlined, 'AI', Colors.black, context, AIAssistantScreen()),
+            //_buildListTile(Icons.feedback_outlined, 'AI', Colors.black, context, AIAssistantScreen()),
             _buildListTile(Icons.share_outlined, 'Invite', Colors.black, context, null),
-            _buildListTile(Icons.help_outline, 'Help', Colors.black, context, CGPACalculatorApp()),
+            _buildListTile(Icons.help_outline, 'Help', Colors.black, context, null),
             _buildListTile(Icons.privacy_tip_outlined, 'Privacy Policy', Colors.black, context, PrivacyPolicyScreen()),
             _buildListTile(Icons.logout_outlined, 'Logout', Colors.red, context, null),
           ],

@@ -1,7 +1,21 @@
+import 'package:bracu_core/menu/ai_assistant.dart';
+import 'package:bracu_core/menu/cgpa_calc.dart';
 import 'package:flutter/material.dart';
 
-class Menu extends StatelessWidget {
+import 'faculty_consultation.dart';
+
+class Menu extends StatefulWidget {
   const Menu({super.key});
+
+  @override
+  State<Menu> createState() => _MenuState();
+}
+
+class _MenuState extends State<Menu> {
+
+  void _navigateTo(BuildContext context, Widget route) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => route));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -11,22 +25,17 @@ class Menu extends StatelessWidget {
         title: const Text('Menu'),
         backgroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              _buildGridView(),
-              const SizedBox(height: 20),
-              _buildTrendingCourses(),
-            ],
+      body: Column(
+        children: [
+          Expanded(
+            child: _buildGridView(context),
           ),
-        ),
+        ],
       ),
     );
   }
 
-  Widget _buildGridView() {
+  Widget _buildGridView(BuildContext context) {
     final List<String> options = [
       'CGPA Calculator',
       'Thesis Finder',
@@ -50,8 +59,8 @@ class Menu extends StatelessWidget {
       Icons.bookmark_add_outlined
     ];
 
-    return SizedBox(
-      height: 300, // Adjust the height as needed
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
       child: GridView.builder(
         itemCount: options.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -63,7 +72,7 @@ class Menu extends StatelessWidget {
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              // Handle tap
+              _handleTap(context, options[index]);
             },
             child: _buildCard(options[index], icons[index]),
           );
@@ -72,43 +81,67 @@ class Menu extends StatelessWidget {
     );
   }
 
+  void _handleTap(BuildContext context, String option) {
+    final Map<String, VoidCallback> actions = {
+      'CGPA Calculator': () => _navigateTo(context, const CGPACalculatorApp()),
+      'Thesis Finder': () => print('Navigate to Thesis Finder'),
+      'AI Assistant': () => _navigateTo(context, const AIAssistantScreen()),
+      'Trending Courses': () => print('Navigate to Trending Courses'),
+      'Faculty Information': () => print('Navigate to Faculty Information'),
+      'Emergency Contacts': () => print('Navigate to Emergency Contacts'),
+      'Routine Generator': () => ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text("Coming soon in next update"))),
+      'St Schedule': () => ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text("Coming soon in next update"))),
+      'Faculty Consultation': () => _navigateTo(context, ConsultationListPage()),
+    };
+
+    if (actions.containsKey(option)) {
+      actions[option]!(); // Safely invoke the callback
+    } else {
+      print('Unknown option');
+    }
+  }
+
   Widget _buildCard(String option, IconData icon) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
-        side: const BorderSide(color: Colors.teal, width: 1),
+        side: const BorderSide(color: Colors.grey, width: 0.7),
       ),
-      elevation: 5,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 40, color: Colors.teal),
-            const SizedBox(height: 10),
-            Text(
-              option,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+      elevation: 3,
+      child: Stack(
+        children: [
+          // Background image
+          Positioned.fill(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: Image.asset(
+                'assets/ui/card_back2.png',
+                fit: BoxFit.cover,
+              ),
             ),
-          ],
-        ),
+          ),
+          // Text and icon overlay
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 40, color: Colors.teal),
+                const SizedBox(height: 10),
+                Text(
+                  option,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-    );
-  }
-
-  Widget _buildTrendingCourses() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text("Trending Courses", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        Container(
-          color: Colors.white10,
-          height: 200,
-          width: double.infinity,
-          child: Center(child: Text("Course placeholder")),
-        )
-      ],
     );
   }
 }
