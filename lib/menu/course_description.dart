@@ -1,93 +1,264 @@
+// import 'package:flutter/material.dart';
+// import 'dart:async';
+// import 'package:http/http.dart' as http;
+// import 'package:html/dom.dart' as dom;
+
+// void main() {
+//   runApp(const MyApp());
+// }
+
+// class MyApp extends StatefulWidget {
+//   const MyApp({super.key});
+
+//   @override
+//   State<MyApp> createState() => _MyAppState();
+// }
+
+// class Article {
+//   final String url;
+//   final String title;
+
+//   const Article({required this.title, required this.url});
+// }
+
+// class _MyAppState extends State<MyApp> {
+//   List<Article> articles = [];
+
+//   @override
+//   void initState() {
+//     super.initState();
+
+//     getWebsiteData();
+//   }
+
+//   Future getWebsiteData() async {
+//     final url = Uri.parse('https://cse.sds.bracu.ac.bd/course/list');
+//     final response = await http.get(url);
+//     dom.Document html = dom.Document.html(response.body);
+
+//     final courseElements =
+//         html.querySelectorAll('div > a').where((element) {
+//           return element.querySelector('p.text-lg') != null;
+//         }).toList();
+
+//     final titles =
+//         courseElements
+//             .map(
+//               (element) => element.querySelector('p.text-lg')!.innerHtml.trim(),
+//             )
+//             .toList();
+
+//     final urls =
+//         courseElements
+//             .map(
+//               (element) =>
+//                   'https://cse.sds.bracu.ac.bd/${element.attributes['href']}',
+//             )
+//             .toList();
+
+//     print('Count: ${titles.length}');
+
+//     setState(() {
+//       articles = List.generate(
+//         titles.length,
+//         (index) => Article(title: titles[index], url: urls[index]),
+//       );
+//     });
+//     for (final title in titles) {
+//       debugPrint(title);
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       home: Scaffold(
+//         appBar: AppBar(title: const Text('Select Course'), centerTitle: true),
+//         body: ListView.builder(
+//           padding: const EdgeInsets.all(12),
+//           itemCount: articles.length,
+//           itemBuilder: (context, index) {
+//             final article = articles[index];
+//             return ListTile(
+//               title: Text(article.title),
+//               subtitle: Text(article.url),
+//             );
+//           },
+//         ),
+//       ),
+//     );
+//   }
+// }
+
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:http/http.dart' as http;
+import 'package:html/dom.dart' as dom;
 
 void main() {
-  runApp(CourseApp());
+  runApp(const MyApp());
 }
 
-class CourseApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class Article {
+  final String url;
+  final String title;
+
+  const Article({required this.title, required this.url});
+}
+
+class _MyAppState extends State<MyApp> {
+  List<Article> articles = [];
+
+  @override
+  void initState() {
+    super.initState();
+    getWebsiteData();
+  }
+
+  Future getWebsiteData() async {
+    final url = Uri.parse('https://cse.sds.bracu.ac.bd/course/list');
+    final response = await http.get(url);
+    dom.Document html = dom.Document.html(response.body);
+
+    final courseElements =
+        html.querySelectorAll('div > a').where((element) {
+          return element.querySelector('p.text-lg') != null;
+        }).toList();
+
+    final titles =
+        courseElements
+            .map(
+              (element) => element.querySelector('p.text-lg')!.innerHtml.trim(),
+            )
+            .toList();
+
+    final urls =
+        courseElements.map((element) {
+          final href = element.attributes['href'] ?? '';
+          if (href.startsWith('http')) {
+            return href; // already full URL
+          } else {
+            return 'https://cse.sds.bracu.ac.bd/$href'; // relative path
+          }
+        }).toList();
+
+    setState(() {
+      articles = List.generate(
+        titles.length,
+        (index) => Article(title: titles[index], url: urls[index]),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Course List',
-      theme: ThemeData(
-        primarySwatch: Colors.orange,
-        scaffoldBackgroundColor: Colors.white,
-      ),
-      home: CourseListPage(),
-    );
-  }
-}
-
-class Course {
-  final String title;
-  final String description;
-
-  Course({required this.title, required this.description});
-}
-
-final List<Course> courses = [
-  Course(title: 'CSE101: Intro to Programming', description: 'Basics of programming in Python, logic building and algorithms.'),
-  Course(title: 'CSE220: Data Structures', description: 'Covers arrays, linked lists, stacks, queues, trees, and graphs.'),
-  Course(title: 'MATH110: Calculus I', description: 'Differential and integral calculus with applications.'),
-  Course(title: 'MATH216: Linear Algebra', description: 'Matrix operations, vector spaces, and eigenvalues.'),
-  Course(title: 'ENG101: English Composition', description: 'Basics of academic writing, grammar, and structure.'),
-  Course(title: 'ENG103: Technical Writing', description: 'Professional communication and technical documentation skills.')
-];
-
-class CourseListPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Courses'),
-        backgroundColor: Colors.orange,
-      ),
-      body: ListView.builder(
-        itemCount: courses.length,
-        itemBuilder: (context, index) {
-          return Card(
-            margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            color: Colors.orange.shade50,
-            child: ListTile(
-              title: Text(
-                courses[index].title,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              trailing: Icon(Icons.arrow_forward_ios, color: Colors.orange),
+      home: Scaffold(
+        appBar: AppBar(title: const Text('Select Course'), centerTitle: true),
+        body: ListView.builder(
+          padding: const EdgeInsets.all(12),
+          itemCount: articles.length,
+          itemBuilder: (context, index) {
+            final article = articles[index];
+            return GestureDetector(
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => CourseDescriptionPage(course: courses[index]),
+                    builder:
+                        (_) => CourseDetailPage(
+                          title: article.title,
+                          url: article.url,
+                        ),
                   ),
                 );
               },
-            ),
-          );
-        },
+              child: Card(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                elevation: 4,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        article.title,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        article.url,
+                        style: const TextStyle(color: Colors.blue),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
 }
 
-class CourseDescriptionPage extends StatelessWidget {
-  final Course course;
+class CourseDetailPage extends StatefulWidget {
+  final String title;
+  final String url;
 
-  CourseDescriptionPage({required this.course});
+  const CourseDetailPage({super.key, required this.title, required this.url});
+
+  @override
+  State<CourseDetailPage> createState() => _CourseDetailPageState();
+}
+
+class _CourseDetailPageState extends State<CourseDetailPage> {
+  String pageContent = 'Loading...';
+
+  @override
+  void initState() {
+    super.initState();
+    loadContent();
+  }
+
+  Future<void> loadContent() async {
+    try {
+      final response = await http.get(Uri.parse(widget.url));
+      final document = dom.Document.html(response.body);
+
+      // Use the long CSS selector to fetch only the course content section
+      final contentElement = document.querySelector(
+        'div.p-4.bg-white.border.rounded-md.md\\:col-span-2.lg\\:col-span-3.xl\\:col-span-4.border-slate-300.md\\:p-4.lg\\:p-6',
+      );
+
+      setState(() {
+        pageContent = contentElement?.text.trim() ?? 'Content not found';
+      });
+    } catch (e) {
+      setState(() {
+        pageContent = 'Failed to load content';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(course.title),
-        backgroundColor: Colors.orange,
-      ),
+      appBar: AppBar(title: Text(widget.title)),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Text(
-          course.description,
-          style: TextStyle(fontSize: 18),
-        ),
+        padding: const EdgeInsets.all(16),
+        child: SingleChildScrollView(child: Text(pageContent)),
       ),
     );
   }
