@@ -8,12 +8,20 @@ import 'package:provider/provider.dart';
 import '../menu/faculty_consultation.dart';
 import '../service/profile_provider.dart';
 import 'update.dart';
+import 'package:share_plus/share_plus.dart';
 
 class Profile extends StatelessWidget {
   const Profile({super.key});
 
   void _navigateTo(BuildContext context, Widget route) {
     Navigator.push(context, MaterialPageRoute(builder: (context) => route));
+  }
+
+  void _shareApp() {
+    Share.share(
+      'Check out this amazing platform! Get onboard and start exploring: https://github.com/Onnesok/bracu_core',
+      subject: 'Invite to Join the Platform',
+    );
   }
 
   @override
@@ -150,7 +158,7 @@ class Profile extends StatelessWidget {
             if (profileProvider.role == 'Admin')
               _buildListTile(Icons.admin_panel_settings_outlined, 'Admin Panel', Colors.red, context, null),
             //_buildListTile(Icons.feedback_outlined, 'AI', Colors.black, context, AIAssistantScreen()),
-            _buildListTile(Icons.share_outlined, 'Invite', Colors.black, context, null),
+            _buildListTile(Icons.share_outlined, 'share app', Colors.black, context, null),
             _buildListTile(Icons.help_outline, 'Help', Colors.black, context, null),
             _buildListTile(Icons.privacy_tip_outlined, 'Privacy Policy', Colors.black, context, PrivacyPolicyScreen()),
             _buildListTile(Icons.logout_outlined, 'Logout', Colors.red, context, null),
@@ -173,7 +181,10 @@ class Profile extends StatelessWidget {
         onTap: () {
           if (title == 'Logout') {
             _showLogoutDialog(context);
-          } else if (route != null) {
+          } else if (title == 'share app') {
+            _shareApp();
+          }
+          else if (route != null) {
             _navigateTo(context, route);
           }
         },
