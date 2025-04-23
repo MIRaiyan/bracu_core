@@ -1,5 +1,6 @@
 import 'package:bracu_core/menu/ai_assistant.dart';
 import 'package:bracu_core/menu/cgpa_calc.dart';
+import 'package:bracu_core/menu/course_description.dart';
 import 'package:bracu_core/menu/st_consultation.dart';
 import 'package:flutter/material.dart';
 
@@ -41,7 +42,7 @@ class _MenuState extends State<Menu> {
       'CGPA Calculator',
       'Thesis Finder',
       'AI Assistant',
-      'Trending Courses',
+      'Course info',
       'Faculty Information',
       'Emergency Contacts',
       'Routine Generator',
@@ -52,7 +53,7 @@ class _MenuState extends State<Menu> {
       Icons.calculate,
       Icons.search,
       Icons.smart_toy,
-      Icons.trending_up,
+      Icons.golf_course_outlined,
       Icons.info,
       Icons.phone,
       Icons.schedule,
@@ -84,10 +85,10 @@ class _MenuState extends State<Menu> {
 
   void _handleTap(BuildContext context, String option) {
     final Map<String, VoidCallback> actions = {
-      'CGPA Calculator': () => _navigateTo(context, const CGPACalculatorApp()),
+      'CGPA Calculator': () => _navigateTo(context, const CgpaCalculatorScreen()),
       'Thesis Finder': () => print('Navigate to Thesis Finder'),
       'AI Assistant': () => _navigateTo(context, const AIAssistantScreen()),
-      'Trending Courses': () => print('Navigate to Trending Courses'),
+      'Course info': () => _navigateTo(context, const course_page()),
       'Faculty Information': () => print('Navigate to Faculty Information'),
       'Emergency Contacts': () => print('Navigate to Emergency Contacts'),
       'Routine Generator': () => ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text("Coming soon in next update"))),

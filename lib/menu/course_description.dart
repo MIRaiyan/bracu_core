@@ -1,109 +1,15 @@
-// import 'package:flutter/material.dart';
-// import 'dart:async';
-// import 'package:http/http.dart' as http;
-// import 'package:html/dom.dart' as dom;
-
-// void main() {
-//   runApp(const MyApp());
-// }
-
-// class MyApp extends StatefulWidget {
-//   const MyApp({super.key});
-
-//   @override
-//   State<MyApp> createState() => _MyAppState();
-// }
-
-// class Article {
-//   final String url;
-//   final String title;
-
-//   const Article({required this.title, required this.url});
-// }
-
-// class _MyAppState extends State<MyApp> {
-//   List<Article> articles = [];
-
-//   @override
-//   void initState() {
-//     super.initState();
-
-//     getWebsiteData();
-//   }
-
-//   Future getWebsiteData() async {
-//     final url = Uri.parse('https://cse.sds.bracu.ac.bd/course/list');
-//     final response = await http.get(url);
-//     dom.Document html = dom.Document.html(response.body);
-
-//     final courseElements =
-//         html.querySelectorAll('div > a').where((element) {
-//           return element.querySelector('p.text-lg') != null;
-//         }).toList();
-
-//     final titles =
-//         courseElements
-//             .map(
-//               (element) => element.querySelector('p.text-lg')!.innerHtml.trim(),
-//             )
-//             .toList();
-
-//     final urls =
-//         courseElements
-//             .map(
-//               (element) =>
-//                   'https://cse.sds.bracu.ac.bd/${element.attributes['href']}',
-//             )
-//             .toList();
-
-//     print('Count: ${titles.length}');
-
-//     setState(() {
-//       articles = List.generate(
-//         titles.length,
-//         (index) => Article(title: titles[index], url: urls[index]),
-//       );
-//     });
-//     for (final title in titles) {
-//       debugPrint(title);
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       home: Scaffold(
-//         appBar: AppBar(title: const Text('Select Course'), centerTitle: true),
-//         body: ListView.builder(
-//           padding: const EdgeInsets.all(12),
-//           itemCount: articles.length,
-//           itemBuilder: (context, index) {
-//             final article = articles[index];
-//             return ListTile(
-//               title: Text(article.title),
-//               subtitle: Text(article.url),
-//             );
-//           },
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:html/dom.dart' as dom;
 
-void main() {
-  runApp(const MyApp());
-}
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+
+class course_page extends StatefulWidget {
+  const course_page({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<course_page> createState() => _MyAppState();
 }
 
 class Article {
@@ -113,7 +19,7 @@ class Article {
   const Article({required this.title, required this.url});
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<course_page> {
   List<Article> articles = [];
 
   @override

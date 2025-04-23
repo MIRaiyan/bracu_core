@@ -85,6 +85,7 @@ class _StudentConsultationListPageState extends State<StudentConsultationListPag
         final course = item['Course'] as String? ?? '';
         final section = item['Section'] as String? ?? '';
         final initial = item['Initial'] as String? ?? '';
+        final name = item['Name'] as String? ?? '';
 
         final matchesCourse = selectedCourse == null || selectedCourse!.isEmpty || course == selectedCourse;
         final matchesSection = selectedSection == null || selectedSection!.isEmpty || section == selectedSection;
@@ -92,7 +93,8 @@ class _StudentConsultationListPageState extends State<StudentConsultationListPag
         final matchesSearch = searchQuery.isEmpty ||
             course.toLowerCase().contains(searchQuery.toLowerCase()) ||
             section.toLowerCase().contains(searchQuery.toLowerCase()) ||
-            initial.toLowerCase().contains(searchQuery.toLowerCase());
+            initial.toLowerCase().contains(searchQuery.toLowerCase()) ||
+            name.toLowerCase().contains(searchQuery.toLowerCase());
 
         return matchesCourse && matchesSection && matchesInitial && matchesSearch;
       }).toList();
@@ -147,7 +149,7 @@ class _StudentConsultationListPageState extends State<StudentConsultationListPag
           value: item,
           child: Text(
             item,
-            style: TextStyle(fontSize: 14, color: Colors.black),
+            style: TextStyle(fontSize: 12, color: Colors.black),
             overflow: TextOverflow.ellipsis,
           ),
         ))
@@ -184,7 +186,6 @@ class _StudentConsultationListPageState extends State<StudentConsultationListPag
       margin: EdgeInsets.all(10),
       child: Stack(
         children: [
-          // Background Image
           Positioned.fill(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(15),
@@ -194,7 +195,6 @@ class _StudentConsultationListPageState extends State<StudentConsultationListPag
               ),
             ),
           ),
-          // Card Content
           Padding(
             padding: const EdgeInsets.all(12.0),
             child: Column(
@@ -210,6 +210,14 @@ class _StudentConsultationListPageState extends State<StudentConsultationListPag
                   overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: 8),
+                Text(
+                  'Initial: ${item['Initial'] ?? 'N/A'}',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.black.withOpacity(0.7),
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
                 Text(
                   'Course: ${item['Course']} - Section: ${item['Section']}',
                   style: TextStyle(
@@ -255,7 +263,10 @@ class _StudentConsultationListPageState extends State<StudentConsultationListPag
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('St Consultations', style: TextStyle(color: Colors.black, letterSpacing: 2, fontSize: 18),),
+        title: Text(
+          'Student Consultations',
+          style: TextStyle(color: Colors.black, letterSpacing: 2, fontSize: 18),
+        ),
         backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
         elevation: 0,
