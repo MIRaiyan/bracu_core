@@ -1,7 +1,9 @@
-import 'package:bracu_core/api/api_root.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:lottie/lottie.dart';
 import 'dart:convert';
+
+import '../api/api_root.dart';
 
 class ConsultationListPage extends StatefulWidget {
   @override
@@ -96,120 +98,195 @@ class _ConsultationListPageState extends State<ConsultationListPage> {
     });
   }
 
+  Widget buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextField(
+        onChanged: (query) {
+          setState(() {
+            searchQuery = query;
+            applyFilter();
+          });
+        },
+        decoration: InputDecoration(
+          labelText: 'Search',
+          labelStyle: TextStyle(fontSize: 14, color: Colors.grey),
+          prefixIcon: Lottie.asset(
+            'assets/animation/search.json',
+            width: 60,
+            height: 60,
+            fit: BoxFit.cover,
+            repeat: true,
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: BorderSide(color: Colors.grey, width: 1.5),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: BorderSide(color: Colors.grey, width: 1.5),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: BorderSide(color: Colors.grey, width: 2),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildDropdown(String label, String? value, List<String> items, ValueChanged<String?> onChanged) {
+    return Expanded(
+      child: DropdownButtonFormField<String>(
+        value: value,
+        items: items
+            .map((item) => DropdownMenuItem(
+          value: item,
+          child: Text(
+            item,
+            style: TextStyle(fontSize: 14, color: Colors.black),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ))
+            .toList(),
+        onChanged: onChanged,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(fontSize: 12, color: Colors.black),
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: BorderSide(color: Colors.grey, width: 1.5),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: BorderSide(color: Colors.grey, width: 1.5),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: BorderSide(color: Colors.grey, width: 2),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildCard(Map<String, dynamic> item) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      elevation: 5,
+      margin: EdgeInsets.all(10),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: Image.asset(
+                'assets/ui/card_back3.png',
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item['Course']?.split('-').first ?? 'No Course',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Theory Initial: ${item['Theory Initial'] ?? 'N/A'}',
+                  style: TextStyle(fontSize: 14, color: Colors.black),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  'Theory: ${item['Theory Day']} @ ${item['Theory Time\n(1hr 20min)']}',
+                  style: TextStyle(fontSize: 14, color: Colors.green),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  'Room: ${item['Theory Room']}',
+                  style: TextStyle(fontSize: 14, color: Colors.black.withOpacity(0.7)),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  'Lab: ${item['Lab Day']} @ ${item['Lab Time (3hr)']}',
+                  style: TextStyle(fontSize: 14, color: Colors.green),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  'Lab Room: ${item['Lab Room']}',
+                  style: TextStyle(fontSize: 14, color: Colors.black.withOpacity(0.7)),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Faculty Consultations'),
+        title: Text(
+          'Faculty Consultations',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
+          ),
+        ),
         backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
         elevation: 0,
+        iconTheme: IconThemeData(color: Colors.black),
       ),
       body: SafeArea(
         child: Column(
           children: [
-            // Search Field
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                onChanged: (query) {
-                  setState(() {
-                    searchQuery = query;
-                    applyFilter();
-                  });
-                },
-                decoration: InputDecoration(
-                  labelText: 'Search',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                ),
-              ),
-            ),
-            // Filter Form
+            buildSearchBar(),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      value: selectedCourse,
-                      items: allCourses
-                          .map((course) => DropdownMenuItem(
-                                value: course,
-                                child: Text(
-                                  course,
-                                  style: TextStyle(fontSize: 12),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ))
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedCourse = value;
-                          applyFilter();
-                        });
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Course',
-                        labelStyle: TextStyle(fontSize: 12),
-                      ),
-                    ),
-                  ),
+                  buildDropdown('Course', selectedCourse, allCourses, (value) {
+                    setState(() {
+                      selectedCourse = value;
+                      applyFilter();
+                    });
+                  }),
                   SizedBox(width: 8),
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      value: selectedInitial,
-                      items: allInitials
-                          .map((initial) => DropdownMenuItem(
-                                value: initial,
-                                child: Text(
-                                  initial,
-                                  style: TextStyle(fontSize: 12),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ))
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedInitial = value;
-                          applyFilter();
-                        });
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Theory Initial',
-                        labelStyle: TextStyle(fontSize: 12),
-                      ),
-                    ),
-                  ),
+                  buildDropdown('Theory Initial', selectedInitial, allInitials, (value) {
+                    setState(() {
+                      selectedInitial = value;
+                      applyFilter();
+                    });
+                  }),
                   SizedBox(width: 8),
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      value: selectedDay,
-                      items: allDays
-                          .map((day) => DropdownMenuItem(
-                                value: day,
-                                child: Text(
-                                  day,
-                                  style: TextStyle(fontSize: 12),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ))
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedDay = value;
-                          applyFilter();
-                        });
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Day',
-                        labelStyle: TextStyle(fontSize: 12),
-                      ),
-                    ),
-                  ),
+                  buildDropdown('Day', selectedDay, allDays, (value) {
+                    setState(() {
+                      selectedDay = value;
+                      applyFilter();
+                    });
+                  }),
                 ],
               ),
             ),
@@ -217,50 +294,12 @@ class _ConsultationListPageState extends State<ConsultationListPage> {
               child: isLoading
                   ? Center(child: CircularProgressIndicator())
                   : ListView.builder(
-                      itemCount: filteredConsultations.length,
-                      itemBuilder: (context, index) {
-                        final item = filteredConsultations[index];
-                        return Card(
-                          margin: EdgeInsets.all(10),
-                          elevation: 3,
-                          child: ListTile(
-                            title: Text(
-                              item['Course']?.split('-').first ?? 'No Course',
-                              style: TextStyle(fontSize: 14),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Theory: ${item['Theory Day']} @ ${item['Theory Time\n(1hr 20min)']}',
-                                  style: TextStyle(fontSize: 12),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                Text(
-                                  'Room: ${item['Theory Room']}',
-                                  style: TextStyle(fontSize: 12),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                Text(
-                                  'Lab: ${item['Lab Day']} @ ${item['Lab Time (3hr)']}',
-                                  style: TextStyle(fontSize: 12),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                Text(
-                                  'Lab Room: ${item['Lab Room']}',
-                                  style: TextStyle(fontSize: 12),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                            isThreeLine: true,
-                            leading: Icon(Icons.person),
-                            trailing: Icon(Icons.arrow_forward_ios, size: 16),
-                          ),
-                        );
-                      },
-                    ),
+                itemCount: filteredConsultations.length,
+                itemBuilder: (context, index) {
+                  final item = filteredConsultations[index];
+                  return buildCard(item);
+                },
+              ),
             ),
           ],
         ),
