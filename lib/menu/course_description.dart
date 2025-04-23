@@ -81,7 +81,9 @@ class _CoursePageState extends State<CoursePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
         elevation: 0,
         title: Text(selectedTitle == null ? 'Select Course' : selectedTitle!),
@@ -193,6 +195,7 @@ class _CoursePageState extends State<CoursePage> {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Card(
+        color: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
         ),
