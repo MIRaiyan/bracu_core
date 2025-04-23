@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:html/dom.dart' as dom;
+import 'package:lottie/lottie.dart';
 
 class CoursePage extends StatefulWidget {
   const CoursePage({super.key});
@@ -98,7 +99,8 @@ class _CoursePageState extends State<CoursePage> {
         ),
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: Lottie.asset('assets/animation/loader.json'),
+      )
           : isError
           ? buildErrorState()
           : selectedTitle == null

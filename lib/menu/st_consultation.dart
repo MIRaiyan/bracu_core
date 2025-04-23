@@ -304,7 +304,7 @@ class _StudentConsultationListPageState extends State<StudentConsultationListPag
             ),
             Expanded(
               child: isLoading
-                  ? Center(child: CircularProgressIndicator())
+                  ? Center(child: Lottie.asset('assets/animation/loader.json'))
                   : ListView.builder(
                 itemCount: filteredConsultations.length,
                 itemBuilder: (context, index) {
