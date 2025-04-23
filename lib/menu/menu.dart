@@ -1,5 +1,6 @@
 import 'package:bracu_core/menu/ai_assistant.dart';
 import 'package:bracu_core/menu/cgpa_calc.dart';
+import 'package:bracu_core/menu/st_consultation.dart';
 import 'package:flutter/material.dart';
 
 import 'faculty_consultation.dart';
@@ -90,7 +91,7 @@ class _MenuState extends State<Menu> {
       'Faculty Information': () => print('Navigate to Faculty Information'),
       'Emergency Contacts': () => print('Navigate to Emergency Contacts'),
       'Routine Generator': () => ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text("Coming soon in next update"))),
-      'St Schedule': () => ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text("Coming soon in next update"))),
+      'St Schedule': () => _navigateTo(context, StudentConsultationListPage()),
       'Faculty Consultation': () => _navigateTo(context, ConsultationListPage()),
     };
 
