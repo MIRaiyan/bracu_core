@@ -88,7 +88,7 @@ class _MenuState extends State<Menu> {
       'CGPA Calculator': () => _navigateTo(context, const CgpaCalculatorScreen()),
       'Thesis Finder': () => print('Navigate to Thesis Finder'),
       'AI Assistant': () => _navigateTo(context, const AIAssistantScreen()),
-      'Course info': () => _navigateTo(context, const course_page()),
+      'Course info': () => _navigateTo(context, const CoursePage()),
       'Faculty Information': () => print('Navigate to Faculty Information'),
       'Emergency Contacts': () => print('Navigate to Emergency Contacts'),
       'Routine Generator': () => ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text("Coming soon in next update"))),
