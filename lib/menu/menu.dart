@@ -1,6 +1,7 @@
 import 'package:bracu_core/menu/ai_assistant.dart';
 import 'package:bracu_core/menu/cgpa_calc.dart';
 import 'package:bracu_core/menu/course_description.dart';
+import 'package:bracu_core/menu/faculty_review.dart';
 import 'package:bracu_core/menu/st_consultation.dart';
 import 'package:flutter/material.dart';
 
@@ -43,7 +44,7 @@ class _MenuState extends State<Menu> {
       'Thesis Finder',
       'AI Assistant',
       'Course info',
-      'Faculty Information',
+      'Faculty Review',
       'Emergency Contacts',
       'Routine Generator',
       'St Schedule',
@@ -89,7 +90,7 @@ class _MenuState extends State<Menu> {
       'Thesis Finder': () => print('Navigate to Thesis Finder'),
       'AI Assistant': () => _navigateTo(context, const AIAssistantScreen()),
       'Course info': () => _navigateTo(context, const CoursePage()),
-      'Faculty Information': () => print('Navigate to Faculty Information'),
+      'Faculty Review': () => _navigateTo(context, const FacultyReviewPage()),
       'Emergency Contacts': () => print('Navigate to Emergency Contacts'),
       'Routine Generator': () => ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text("Coming soon in next update"))),
       'St Schedule': () => _navigateTo(context, StudentConsultationListPage()),

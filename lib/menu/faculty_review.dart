@@ -1,22 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // For formatting date
+import 'package:intl/intl.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Faculty Review Page',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: FacultyReviewPage(),
-    );
-  }
-}
 
 class FacultyReviewPage extends StatefulWidget {
   const FacultyReviewPage({Key? key}) : super(key: key);
