@@ -2,6 +2,7 @@ import 'package:bracu_core/auth/login.dart';
 import 'package:bracu_core/menu/ai_assistant.dart';
 import 'package:bracu_core/menu/cgpa_calc.dart';
 import 'package:bracu_core/profile/feedback.dart';
+import 'package:bracu_core/profile/notification_permission.dart';
 import 'package:bracu_core/profile/privacy_policy.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -153,7 +154,7 @@ class Profile extends StatelessWidget {
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
           children: [
-            _buildListTile(Icons.notifications_none_outlined, 'Notification Setting', Colors.black, context, null),
+            _buildListTile(Icons.notifications_none_outlined, 'Notification Setting', Colors.black, context, PermissionSettings()),
             _buildListTile(Icons.star_border_outlined, 'Rate App', Colors.black, context, RatingPage()),
             if (profileProvider.role == 'Admin')
               _buildListTile(Icons.admin_panel_settings_outlined, 'Admin Panel', Colors.red, context, null),
