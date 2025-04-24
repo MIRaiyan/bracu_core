@@ -6,10 +6,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'menu/faculty_consultation.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,6 +38,16 @@ Future<void> main() async {
 
   await dotenv.load(fileName: ".env");
 
+  //onesignal notification part
+  String? oneSignalAppId = dotenv.env['ONESIGNAL_APP_ID'];
+  if (oneSignalAppId != null) {
+    OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+    OneSignal.initialize(oneSignalAppId);
+    OneSignal.Notifications.requestPermission(true);
+  } else {
+    throw Exception('ONESIGNAL_APP_ID not found in .env');
+  }
+
   runApp(
     MultiProvider(
       providers: [
@@ -46,17 +56,6 @@ Future<void> main() async {
       child: MyApp(isLoggedIn: isLoggedIn),
     ),
   );
-
-  runApp(const MyApp());
-
-  // Enable verbose logging for debugging (remove in production)
-  OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-  // Initialize with your OneSignal App ID
-  OneSignal.initialize("Initialization ID");
-  // Use this method to prompt for push notifications.
-  // We recommend removing this method after testing and instead use In-App Messages to prompt for notification permission.
-  OneSignal.Notifications.requestPermission(false);
-  
 }
 
 class MyApp extends StatelessWidget {
