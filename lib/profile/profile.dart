@@ -2,6 +2,7 @@ import 'package:bracu_core/auth/login.dart';
 import 'package:bracu_core/menu/ai_assistant.dart';
 import 'package:bracu_core/menu/cgpa_calc.dart';
 import 'package:bracu_core/profile/feedback.dart';
+import 'package:bracu_core/profile/help_page.dart';
 import 'package:bracu_core/profile/notification_permission.dart';
 import 'package:bracu_core/profile/privacy_policy.dart';
 import 'package:flutter/material.dart';
@@ -160,7 +161,7 @@ class Profile extends StatelessWidget {
               _buildListTile(Icons.admin_panel_settings_outlined, 'Admin Panel', Colors.red, context, null),
             //_buildListTile(Icons.feedback_outlined, 'AI', Colors.black, context, AIAssistantScreen()),
             _buildListTile(Icons.share_outlined, 'share app', Colors.black, context, null),
-            _buildListTile(Icons.help_outline, 'Help', Colors.black, context, null),
+            _buildListTile(Icons.help_outline, 'Help', Colors.black, context, HelpPage()),
             _buildListTile(Icons.privacy_tip_outlined, 'Privacy Policy', Colors.black, context, PrivacyPolicyScreen()),
             _buildListTile(Icons.logout_outlined, 'Logout', Colors.red, context, null),
           ],

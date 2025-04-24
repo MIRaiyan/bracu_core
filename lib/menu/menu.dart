@@ -4,6 +4,7 @@ import 'package:bracu_core/menu/cgpa_calc.dart';
 import 'package:bracu_core/menu/course_description.dart';
 import 'package:bracu_core/menu/faculty_review.dart';
 import 'package:bracu_core/menu/st_consultation.dart';
+import 'package:bracu_core/profile/help_page.dart';
 import 'package:flutter/material.dart';
 
 import 'faculty_consultation.dart';
@@ -92,7 +93,7 @@ class _MenuState extends State<Menu> {
       'AI Assistant': () => _navigateTo(context, const AIAssistantScreen()),
       'Course info': () => _navigateTo(context, const CoursePage()),
       'Faculty Review': () => _navigateTo(context, const FacultyReviewPage()),
-      'Emergency Contacts': () => print('Navigate to Emergency Contacts'),
+      'Emergency Contacts': () => _navigateTo(context, HelpPage()),
       'Alumni Info': () => _navigateTo(context, AlumniInfoPage()),  //ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text("Coming soon in next update"))),
       'St Schedule': () => _navigateTo(context, StudentConsultationListPage()),
       'Faculty Consultation': () => _navigateTo(context, ConsultationListPage()),
