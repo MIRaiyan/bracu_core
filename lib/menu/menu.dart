@@ -1,4 +1,5 @@
 import 'package:bracu_core/menu/ai_assistant.dart';
+import 'package:bracu_core/menu/alumnifrontend.dart';
 import 'package:bracu_core/menu/cgpa_calc.dart';
 import 'package:bracu_core/menu/course_description.dart';
 import 'package:bracu_core/menu/faculty_review.dart';
@@ -46,7 +47,7 @@ class _MenuState extends State<Menu> {
       'Course info',
       'Faculty Review',
       'Emergency Contacts',
-      'Routine Generator',
+      'Alumni Info',
       'St Schedule',
       'Faculty Consultation'
     ];
@@ -57,8 +58,8 @@ class _MenuState extends State<Menu> {
       Icons.golf_course_outlined,
       Icons.info,
       Icons.phone,
-      Icons.schedule,
-      Icons.bookmark_add_outlined,
+      Icons.people_alt_outlined,
+      Icons.face_4_outlined,
       Icons.bookmark_add_outlined
     ];
 
@@ -92,7 +93,7 @@ class _MenuState extends State<Menu> {
       'Course info': () => _navigateTo(context, const CoursePage()),
       'Faculty Review': () => _navigateTo(context, const FacultyReviewPage()),
       'Emergency Contacts': () => print('Navigate to Emergency Contacts'),
-      'Routine Generator': () => ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text("Coming soon in next update"))),
+      'Alumni Info': () => _navigateTo(context, AlumniInfoPage()),  //ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text("Coming soon in next update"))),
       'St Schedule': () => _navigateTo(context, StudentConsultationListPage()),
       'Faculty Consultation': () => _navigateTo(context, ConsultationListPage()),
     };

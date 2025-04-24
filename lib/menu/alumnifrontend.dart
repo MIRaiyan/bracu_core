@@ -2,49 +2,10 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-// ================= MAIN APP =================
-void main() {
-  runApp(MyApp());
-}
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Alumni App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: HomeScreen(),
-    );
-  }
-}
 
-// ================= HOME SCREEN =================
-// This is the entry point with Alumni Info button
-class HomeScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Alumni App')),
-      body: Center(
-        child: ElevatedButton(
-          child: Text('Alumni Info'),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => AlumniInfoPage()),
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
 
-// ================= ALUMNI INFO PAGE =================
-// Main alumni page with two options: View and Upload
+
 class AlumniInfoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
