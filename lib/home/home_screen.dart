@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
-import 'package:bracu_core/home/notificationPage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -10,6 +9,7 @@ import 'package:location/location.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../api/api_root.dart';
 import '../service/profile_provider.dart';
+import 'notification_page.dart';
 import 'searchbar.dart';
 import 'package:animations/animations.dart';
 import 'package:intl/intl.dart';
@@ -202,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           repeat: false,
                         ),
                       ),
-                      openBuilder: (ctx, action) => const Notificationpage(),
+                      openBuilder: (ctx, action) => NotificationViewPage(title: 'Notifications'),
                     ),
                   ],
                 ),
