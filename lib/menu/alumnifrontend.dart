@@ -1,514 +1,246 @@
-import 'package:flutter/material.dart';
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+const String apiRoot = "https://bracu-core-backend.vercel.app";
 
+void main() => runApp(MyApp());
 
-
-
-class AlumniInfoPage extends StatelessWidget {
+class MyApp extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Alumni Information'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+  Widget build(BuildContext context) => MaterialApp(
+    debugShowCheckedModeBanner: false,
+    title: 'Alumni Manager',
+    theme: ThemeData(
+      primarySwatch: Colors.deepOrange,
+      scaffoldBackgroundColor: Colors.grey[100],
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.deepOrange,
+          foregroundColor: Colors.white,
         ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                minimumSize: Size(250, 50),
+    ),
+    home: HomePage(),
+  );
+}
+
+// HOME PAGE (View Alumni + FAB to Add)
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  Future<List<dynamic>> fetchAlumni() async {
+    final response = await http.get(Uri.parse("$apiRoot/api/alumni"));
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)['alumni'];
+    } else {
+      throw Exception("Failed to load alumni");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(
+      title: Text("Alumni Manager"),
+      backgroundColor: Colors.deepOrange,
+    ),
+    body: FutureBuilder<List<dynamic>>(
+      future: fetchAlumni(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting)
+          return Center(child: CircularProgressIndicator());
+        if (snapshot.hasError)
+          return Center(child: Text('Error: ${snapshot.error}'));
+
+        final alumni = snapshot.data!;
+        return ListView.builder(
+          padding: EdgeInsets.all(8),
+          itemCount: alumni.length,
+          itemBuilder: (context, index) {
+            final a = alumni[index];
+            return Card(
+              elevation: 3,
+              margin: EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+              child: Padding(
+                padding: EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "👤 ${a['full_name'] ?? ''}",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text("📧 ${a['email'] ?? ''}"),
+                    Text("📱 ${a['phone'] ?? ''}"),
+                    Text("🎓 ${a['degree'] ?? ''}, ${a['university'] ?? ''}"),
+                    Text("📅 Graduation Year: ${a['graduation_year'] ?? ''}"),
+                    Text("🏠 Address: ${a['current_address'] ?? ''}"),
+                    if (a['current_position'] != null)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("💼 ${a['current_position']['title'] ?? ''}"),
+                          Text("🏢 ${a['current_position']['company'] ?? ''}"),
+                          Text("📍 ${a['current_position']['location'] ?? ''}"),
+                        ],
+                      ),
+                    if ((a['linkedin'] ?? '').isNotEmpty)
+                      Text("🔗 LinkedIn: ${a['linkedin']}"),
+                    if (a['achievements'] != null)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("🏅 Achievements:"),
+                          ...List.from(
+                            a['achievements'],
+                          ).map((ach) => Text("• $ach")).toList(),
+                        ],
+                      ),
+                    Text("✅ Approved: ${a['approved'] == true ? 'Yes' : 'No'}"),
+                  ],
+                ),
               ),
-              child: Text('View Existing Alumni Info'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ViewAlumniInfo()),
-                );
-              },
+            );
+          },
+        );
+      },
+    ),
+    floatingActionButton: FloatingActionButton.extended(
+      backgroundColor: Colors.deepOrange,
+      icon: Icon(Icons.add),
+      label: Text("Add an alumni?"),
+      onPressed:
+          () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => AddAlumniPage()),
+          ).then((_) => setState(() {})), // Refresh list
+    ),
+  );
+}
+
+// ADD ALUMNI PAGE
+class AddAlumniPage extends StatefulWidget {
+  @override
+  _AddAlumniPageState createState() => _AddAlumniPageState();
+}
+
+class _AddAlumniPageState extends State<AddAlumniPage> {
+  final _formKey = GlobalKey<FormState>();
+  final Map<String, dynamic> alumniData = {
+    "full_name": "",
+    "email": "",
+    "phone": "",
+    "graduation_year": 0,
+    "degree": "",
+    "university": "",
+    "current_address": "",
+    "current_position": {"title": "", "company": "", "location": ""},
+    "linkedin": "",
+    "achievements": [],
+  };
+
+  final achievementsController = TextEditingController();
+
+  Future<void> submit() async {
+    if (achievementsController.text.isNotEmpty) {
+      alumniData["achievements"] =
+          achievementsController.text
+              .split(',')
+              .map((e) => e.trim())
+              .where((e) => e.isNotEmpty)
+              .toList();
+    }
+
+    final response = await http.post(
+      Uri.parse("$apiRoot/api/alumni"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(alumniData),
+    );
+    if (response.statusCode == 201) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("✅ Alumni added successfully")));
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("❌ Failed to add alumni")));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(
+      title: Text("Add Alumni"),
+      backgroundColor: Colors.deepOrange,
+    ),
+    body: Padding(
+      padding: EdgeInsets.all(16),
+      child: Form(
+        key: _formKey,
+        child: ListView(
+          children: [
+            ...["full_name", "email", "phone", "degree", "university"].map(
+              (field) => TextFormField(
+                decoration: InputDecoration(labelText: field),
+                onChanged: (value) => alumniData[field] = value,
+                validator: (v) => v!.isEmpty ? "$field required" : null,
+              ),
+            ),
+            TextFormField(
+              decoration: InputDecoration(labelText: "Graduation Year"),
+              keyboardType: TextInputType.number,
+              onChanged:
+                  (value) =>
+                      alumniData["graduation_year"] = int.tryParse(value) ?? 0,
+              validator: (v) => v!.isEmpty ? "Required" : null,
+            ),
+            TextFormField(
+              decoration: InputDecoration(labelText: "Current Address"),
+              onChanged: (value) => alumniData["current_address"] = value,
+            ),
+            TextFormField(
+              decoration: InputDecoration(labelText: "Current Title"),
+              onChanged:
+                  (value) => alumniData["current_position"]["title"] = value,
+            ),
+            TextFormField(
+              decoration: InputDecoration(labelText: "Current Company"),
+              onChanged:
+                  (value) => alumniData["current_position"]["company"] = value,
+            ),
+            TextFormField(
+              decoration: InputDecoration(labelText: "Current Location"),
+              onChanged:
+                  (value) => alumniData["current_position"]["location"] = value,
+            ),
+            TextFormField(
+              decoration: InputDecoration(labelText: "LinkedIn URL"),
+              onChanged: (value) => alumniData["linkedin"] = value,
+            ),
+            TextFormField(
+              controller: achievementsController,
+              decoration: InputDecoration(
+                labelText: "Achievements (comma separated)",
+              ),
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                minimumSize: Size(250, 50),
-              ),
-              child: Text('Upload Alumni Info'),
+              child: Text("Submit"),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => UploadAlumniInfo()),
-                );
+                if (_formKey.currentState!.validate()) submit();
               },
             ),
           ],
         ),
       ),
-    );
-  }
-}
-
-// ================= ALUMNI MODEL =================
-// Model class to represent alumni data
-class Alumni {
-  final String id;
-  final String name;
-  final String admissionSession;
-  final String graduatingSession;
-  final String workDomain;
-  final String company;
-  final String speciality;
-  final String currentAddress;
-  final String contactInfo;
-  final String others;
-  final bool isVerified;
-
-  Alumni({
-    required this.id,
-    required this.name,
-    required this.admissionSession,
-    required this.graduatingSession,
-    required this.workDomain,
-    required this.company,
-    required this.speciality,
-    required this.currentAddress,
-    required this.contactInfo,
-    required this.others,
-    required this.isVerified,
-  });
-
-  factory Alumni.fromJson(Map<String, dynamic> json) {
-    return Alumni(
-      id: json['_id'] ?? '',
-      name: json['name'] ?? '',
-      admissionSession: json['admissionSession'] ?? '',
-      graduatingSession: json['graduatingSession'] ?? '',
-      workDomain: json['workDomain'] ?? '',
-      company: json['company'] ?? '',
-      speciality: json['speciality'] ?? '',
-      currentAddress: json['currentAddress'] ?? '',
-      contactInfo: json['contactInfo'] ?? '',
-      others: json['others'] ?? '',
-      isVerified: json['isVerified'] ?? false,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'admissionSession': admissionSession,
-      'graduatingSession': graduatingSession,
-      'workDomain': workDomain,
-      'company': company,
-      'speciality': speciality,
-      'currentAddress': currentAddress,
-      'contactInfo': contactInfo,
-      'others': others,
-    };
-  }
-}
-
-// ================= ALUMNI SERVICE =================
-// Service class for API interactions
-class AlumniService {
-  final String baseUrl =
-      'http://10.0.2.2:3000'; // localhost for Android emulator
-
-  Future<List<Alumni>> getAlumni() async {
-    try {
-      final response = await http.get(Uri.parse('$baseUrl/api/alumni'));
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body);
-        return data.map((json) => Alumni.fromJson(json)).toList();
-      } else {
-        // If API call fails, use mock data for development
-        print('API request failed with status: ${response.statusCode}');
-        return _getMockAlumni();
-      }
-    } catch (e) {
-      // If there's any exception (like connection error), use mock data
-      print('Error getting alumni data: $e');
-      return _getMockAlumni();
-    }
-  }
-
-  Future<void> submitAlumni(Alumni alumni) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/api/alumni'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(alumni.toJson()),
-      );
-
-      if (response.statusCode != 201) {
-        throw Exception('Failed to submit alumni data');
-      }
-    } catch (e) {
-      // For development purposes, just print the error and return
-      print('Error submitting alumni: $e');
-      await Future.delayed(Duration(seconds: 1)); // Simulate network delay
-    }
-  }
-
-  // Mock data for development purposes
-  List<Alumni> _getMockAlumni() {
-    return [
-      Alumni(
-        id: '1',
-        name: 'John Doe',
-        admissionSession: '2015',
-        graduatingSession: '2019',
-        workDomain: 'Software Development',
-        company: 'Google',
-        speciality: 'Mobile Development',
-        currentAddress: 'Mountain View, CA',
-        contactInfo: 'john.doe@example.com',
-        others: 'Flutter enthusiast',
-        isVerified: true,
-      ),
-      Alumni(
-        id: '2',
-        name: 'Jane Smith',
-        admissionSession: '2016',
-        graduatingSession: '2020',
-        workDomain: 'Data Science',
-        company: 'Amazon',
-        speciality: 'Machine Learning',
-        currentAddress: 'Seattle, WA',
-        contactInfo: 'jane.smith@example.com',
-        others: 'Loves hiking',
-        isVerified: true,
-      ),
-    ];
-  }
-}
-
-// ================= VIEW ALUMNI INFO SCREEN =================
-// Screen to display existing alumni information
-class ViewAlumniInfo extends StatefulWidget {
-  @override
-  _ViewAlumniInfoState createState() => _ViewAlumniInfoState();
-}
-
-class _ViewAlumniInfoState extends State<ViewAlumniInfo> {
-  final AlumniService _alumniService = AlumniService();
-  List<Alumni> _alumniList = [];
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadAlumniData();
-  }
-
-  Future<void> _loadAlumniData() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      // In a real app, this would fetch data from your API
-      final List<Alumni> alumni = await _alumniService.getAlumni();
-
-      // Make sure we're still mounted before setting state
-      if (mounted) {
-        setState(() {
-          _alumniList = alumni;
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      // Make sure we're still mounted before setting state
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to load alumni data: ${e.toString()}'),
-          ),
-        );
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('View Alumni Information'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
-      body:
-          _isLoading
-              ? Center(child: CircularProgressIndicator())
-              : _alumniList.isEmpty
-              ? Center(child: Text('No alumni information available'))
-              : ListView.builder(
-                itemCount: _alumniList.length,
-                itemBuilder: (context, index) {
-                  final alumni = _alumniList[index];
-                  return Card(
-                    margin: EdgeInsets.all(8.0),
-                    child: ExpansionTile(
-                      title: Text(alumni.name),
-                      subtitle: Text(
-                        '${alumni.admissionSession} - ${alumni.graduatingSession}',
-                      ),
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              _buildInfoRow('Work Domain', alumni.workDomain),
-                              _buildInfoRow('Company', alumni.company),
-                              _buildInfoRow('Speciality', alumni.speciality),
-                              _buildInfoRow(
-                                'Current Address',
-                                alumni.currentAddress,
-                              ),
-                              _buildInfoRow('Contact Info', alumni.contactInfo),
-                              _buildInfoRow('Others', alumni.others),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-    );
-  }
-
-  // Helper method to build consistent info rows
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text('$label: ', style: TextStyle(fontWeight: FontWeight.bold)),
-          Expanded(child: Text(value)),
-        ],
-      ),
-    );
-  }
-}
-
-// ================= UPLOAD ALUMNI INFO SCREEN =================
-// Form screen to submit new alumni information
-class UploadAlumniInfo extends StatefulWidget {
-  @override
-  _UploadAlumniInfoState createState() => _UploadAlumniInfoState();
-}
-
-class _UploadAlumniInfoState extends State<UploadAlumniInfo> {
-  final _formKey = GlobalKey<FormState>();
-  final AlumniService _alumniService = AlumniService();
-
-  // Text controllers for all form fields
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _admissionSessionController =
-      TextEditingController();
-  final TextEditingController _graduatingSessionController =
-      TextEditingController();
-  final TextEditingController _workDomainController = TextEditingController();
-  final TextEditingController _companyController = TextEditingController();
-  final TextEditingController _specialityController = TextEditingController();
-  final TextEditingController _currentAddressController =
-      TextEditingController();
-  final TextEditingController _contactInfoController = TextEditingController();
-  final TextEditingController _othersController = TextEditingController();
-
-  bool _isSubmitting = false;
-
-  @override
-  void dispose() {
-    // Clean up controllers when widget is disposed
-    _nameController.dispose();
-    _admissionSessionController.dispose();
-    _graduatingSessionController.dispose();
-    _workDomainController.dispose();
-    _companyController.dispose();
-    _specialityController.dispose();
-    _currentAddressController.dispose();
-    _contactInfoController.dispose();
-    _othersController.dispose();
-    super.dispose();
-  }
-
-  // Handle form submission
-  void _submitForm() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isSubmitting = true;
-      });
-
-      try {
-        final alumni = Alumni(
-          id: '', // Will be assigned by the backend
-          name: _nameController.text,
-          admissionSession: _admissionSessionController.text,
-          graduatingSession: _graduatingSessionController.text,
-          workDomain: _workDomainController.text,
-          company: _companyController.text,
-          speciality: _specialityController.text,
-          currentAddress: _currentAddressController.text,
-          contactInfo: _contactInfoController.text,
-          others: _othersController.text,
-          isVerified: false, // Default to false, will be verified by admin
-        );
-
-        await _alumniService.submitAlumni(alumni);
-
-        // Show success message and navigate back
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Alumni information submitted successfully')),
-        );
-        Navigator.pop(context);
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to submit alumni information')),
-        );
-      } finally {
-        setState(() {
-          _isSubmitting = false;
-        });
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Upload Alumni Information'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                // Form fields for all required alumni information
-                _buildTextField(
-                  controller: _nameController,
-                  label: 'Full Name',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your name';
-                    }
-                    return null;
-                  },
-                ),
-                _buildTextField(
-                  controller: _admissionSessionController,
-                  label: 'Admission Session',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your admission session';
-                    }
-                    return null;
-                  },
-                ),
-                _buildTextField(
-                  controller: _graduatingSessionController,
-                  label: 'Graduating Session',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your graduating session';
-                    }
-                    return null;
-                  },
-                ),
-                _buildTextField(
-                  controller: _workDomainController,
-                  label: 'Work Domain',
-                ),
-                _buildTextField(
-                  controller: _companyController,
-                  label: 'Company',
-                ),
-                _buildTextField(
-                  controller: _specialityController,
-                  label: 'Speciality',
-                ),
-                _buildTextField(
-                  controller: _currentAddressController,
-                  label: 'Current Address',
-                ),
-                _buildTextField(
-                  controller: _contactInfoController,
-                  label: 'Contact Info',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter contact information';
-                    }
-                    return null;
-                  },
-                ),
-                _buildTextField(
-                  controller: _othersController,
-                  label: 'Others',
-                  maxLines: 3,
-                ),
-                SizedBox(height: 20),
-                // Submit button with loading state
-                ElevatedButton(
-                  onPressed: _isSubmitting ? null : _submitForm,
-                  child:
-                      _isSubmitting
-                          ? CircularProgressIndicator(color: Colors.white)
-                          : Text('Submit Alumni Information'),
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Helper method to build consistent text fields
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    String? Function(String?)? validator,
-    int maxLines = 1,
-  }) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 16.0),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(),
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        ),
-        validator: validator,
-        maxLines: maxLines,
-      ),
-    );
-  }
+    ),
+  );
 }
