@@ -4,34 +4,14 @@ import 'package:http/http.dart' as http;
 
 const String apiRoot = "https://bracu-core-backend.vercel.app";
 
-void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
+// ALUMNI INFO PAGE
+class AlumniInfoPage extends StatefulWidget {
   @override
-  Widget build(BuildContext context) => MaterialApp(
-    debugShowCheckedModeBanner: false,
-    title: 'Alumni Manager',
-    theme: ThemeData(
-      primarySwatch: Colors.deepOrange,
-      scaffoldBackgroundColor: Colors.grey[100],
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.deepOrange,
-          foregroundColor: Colors.white,
-        ),
-      ),
-    ),
-    home: HomePage(),
-  );
+  _AlumniInfoPageState createState() => _AlumniInfoPageState();
 }
 
-// HOME PAGE (View Alumni + FAB to Add)
-class HomePage extends StatefulWidget {
-  @override
-  _HomePageState createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
+class _AlumniInfoPageState extends State<AlumniInfoPage> {
   Future<List<dynamic>> fetchAlumni() async {
     final response = await http.get(Uri.parse("$apiRoot/api/alumni"));
     if (response.statusCode == 200) {
@@ -44,8 +24,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
-      title: Text("Alumni Manager"),
-      backgroundColor: Colors.deepOrange,
+      title: Text("Alumni Info", style: TextStyle(color: Colors.white, letterSpacing: 2, fontSize: 16),),
+      backgroundColor: Colors.deepPurple,
+      foregroundColor: Colors.white,
     ),
     body: FutureBuilder<List<dynamic>>(
       future: fetchAlumni(),
@@ -113,25 +94,24 @@ class _HomePageState extends State<HomePage> {
       },
     ),
     floatingActionButton: FloatingActionButton.extended(
-      backgroundColor: Colors.deepOrange,
+      backgroundColor: Colors.deepPurple,
       icon: Icon(Icons.add),
-      label: Text("Add an alumni?"),
-      onPressed:
-          () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => AddAlumniPage()),
-          ).then((_) => setState(() {})), // Refresh list
+      label: Text("Add an alumni?", style: TextStyle(color: Colors.white),),
+      onPressed: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => AddAlumniInfoPage()),
+      ).then((_) => setState(() {})), // Refresh list
     ),
   );
 }
 
-// ADD ALUMNI PAGE
-class AddAlumniPage extends StatefulWidget {
+// ADD ALUMNI INFO PAGE
+class AddAlumniInfoPage extends StatefulWidget {
   @override
-  _AddAlumniPageState createState() => _AddAlumniPageState();
+  _AddAlumniInfoPageState createState() => _AddAlumniInfoPageState();
 }
 
-class _AddAlumniPageState extends State<AddAlumniPage> {
+class _AddAlumniInfoPageState extends State<AddAlumniInfoPage> {
   final _formKey = GlobalKey<FormState>();
   final Map<String, dynamic> alumniData = {
     "full_name": "",
@@ -150,12 +130,11 @@ class _AddAlumniPageState extends State<AddAlumniPage> {
 
   Future<void> submit() async {
     if (achievementsController.text.isNotEmpty) {
-      alumniData["achievements"] =
-          achievementsController.text
-              .split(',')
-              .map((e) => e.trim())
-              .where((e) => e.isNotEmpty)
-              .toList();
+      alumniData["achievements"] = achievementsController.text
+          .split(',')
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .toList();
     }
 
     final response = await http.post(
@@ -178,8 +157,9 @@ class _AddAlumniPageState extends State<AddAlumniPage> {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
-      title: Text("Add Alumni"),
-      backgroundColor: Colors.deepOrange,
+      title: Text("Add Alumni Info", style: TextStyle(color: Colors.white, letterSpacing: 2, fontSize: 16),),
+      backgroundColor: Colors.deepPurple,
+      foregroundColor: Colors.white,
     ),
     body: Padding(
       padding: EdgeInsets.all(16),
@@ -188,7 +168,7 @@ class _AddAlumniPageState extends State<AddAlumniPage> {
         child: ListView(
           children: [
             ...["full_name", "email", "phone", "degree", "university"].map(
-              (field) => TextFormField(
+                  (field) => TextFormField(
                 decoration: InputDecoration(labelText: field),
                 onChanged: (value) => alumniData[field] = value,
                 validator: (v) => v!.isEmpty ? "$field required" : null,
@@ -197,9 +177,8 @@ class _AddAlumniPageState extends State<AddAlumniPage> {
             TextFormField(
               decoration: InputDecoration(labelText: "Graduation Year"),
               keyboardType: TextInputType.number,
-              onChanged:
-                  (value) =>
-                      alumniData["graduation_year"] = int.tryParse(value) ?? 0,
+              onChanged: (value) =>
+              alumniData["graduation_year"] = int.tryParse(value) ?? 0,
               validator: (v) => v!.isEmpty ? "Required" : null,
             ),
             TextFormField(
@@ -208,18 +187,18 @@ class _AddAlumniPageState extends State<AddAlumniPage> {
             ),
             TextFormField(
               decoration: InputDecoration(labelText: "Current Title"),
-              onChanged:
-                  (value) => alumniData["current_position"]["title"] = value,
+              onChanged: (value) =>
+              alumniData["current_position"]["title"] = value,
             ),
             TextFormField(
               decoration: InputDecoration(labelText: "Current Company"),
-              onChanged:
-                  (value) => alumniData["current_position"]["company"] = value,
+              onChanged: (value) =>
+              alumniData["current_position"]["company"] = value,
             ),
             TextFormField(
               decoration: InputDecoration(labelText: "Current Location"),
-              onChanged:
-                  (value) => alumniData["current_position"]["location"] = value,
+              onChanged: (value) =>
+              alumniData["current_position"]["location"] = value,
             ),
             TextFormField(
               decoration: InputDecoration(labelText: "LinkedIn URL"),
@@ -234,6 +213,11 @@ class _AddAlumniPageState extends State<AddAlumniPage> {
             SizedBox(height: 20),
             ElevatedButton(
               child: Text("Submit"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(vertical: 12),
+              ),
               onPressed: () {
                 if (_formKey.currentState!.validate()) submit();
               },
