@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../service/profile_provider.dart';
 import 'update_profile.dart';
 import 'update_password.dart';
+import 'package:share_plus/share_plus.dart';
 
 class Profile extends StatelessWidget {
   const Profile({super.key});
@@ -26,7 +27,6 @@ class Profile extends StatelessWidget {
         backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
       ),
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -49,7 +49,9 @@ class Profile extends StatelessWidget {
         Center(
           child: CircleAvatar(
             radius: 50,
-            backgroundImage: NetworkImage(profileProvider.profilePicture?.isNotEmpty == true
+            backgroundImage: NetworkImage(profileProvider
+                        .profilePicture?.isNotEmpty ==
+                    true
                 ? profileProvider.profilePicture!
                 : 'https://decisionsystemsgroup.github.io/workshop-html/img/john-doe.jpg'),
           ),
@@ -65,14 +67,25 @@ class Profile extends StatelessWidget {
     );
   }
 
-  Widget _buildGridOptions(BuildContext context, ProfileProvider profileProvider) {
-    List<String> options = ['Update Profile', 'Change Password', 'Location Setting'];
-    List<IconData> icons = [Icons.person_outline, Icons.lock_outline, Icons.location_on_outlined];
+  Widget _buildGridOptions(
+      BuildContext context, ProfileProvider profileProvider) {
+    List<String> options = [
+      'Update Profile',
+      'Change Password',
+      'Location Setting'
+    ];
+    List<IconData> icons = [
+      Icons.person_outline,
+      Icons.lock_outline,
+      Icons.location_on_outlined
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Profile settings", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+        Text("Profile settings",
+            style: TextStyle(
+                fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
         SizedBox(height: 10),
         GridView.builder(
           shrinkWrap: true,
@@ -96,8 +109,10 @@ class Profile extends StatelessWidget {
                         permanentAddress: profileProvider.permanentAddress,
                         presentAddress: profileProvider.currentAddress,
                         emergencyContactName: profileProvider.emergencyName,
-                        emergencyContactRelation: profileProvider.emergencyRelation,
-                        emergencyContactPhoneNumber: profileProvider.emergencyPhoneNumber,
+                        emergencyContactRelation:
+                            profileProvider.emergencyRelation,
+                        emergencyContactPhoneNumber:
+                            profileProvider.emergencyPhoneNumber,
                       ),
                     ),
                   );
@@ -119,11 +134,22 @@ class Profile extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(icons[index], size: 40, color: Colors.teal,),
+                    Icon(
+                      icons[index],
+                      size: 40,
+                      color: Colors.teal,
+                    ),
                     SizedBox(height: 10),
                     Padding(
                       padding: const EdgeInsets.all(4),
-                      child: Text(options[index], textAlign: TextAlign.center, style: TextStyle(fontSize: 14,),maxLines: 2,),
+                      child: Text(
+                        options[index],
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 14,
+                        ),
+                        maxLines: 2,
+                      ),
                     ),
                   ],
                 ),
@@ -139,26 +165,35 @@ class Profile extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('App Settings', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+        Text('App Settings',
+            style: TextStyle(
+                fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
         SizedBox(height: 10),
         ListView(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
           children: [
-            _buildListTile(Icons.notifications_none_outlined, 'Notification Setting', Colors.black, context),
-            _buildListTile(Icons.star_border_outlined, 'Rate App', Colors.black, context),
-            _buildListTile(Icons.feedback_outlined, 'Feedback', Colors.black, context),
-            _buildListTile(Icons.share_outlined, 'Invite', Colors.black, context),
+            _buildListTile(Icons.notifications_none_outlined,
+                'Notification Setting', Colors.black, context),
+            _buildListTile(
+                Icons.star_border_outlined, 'Rate App', Colors.black, context),
+            _buildListTile(
+                Icons.feedback_outlined, 'Feedback', Colors.black, context),
+            _buildListTile(
+                Icons.share_outlined, 'Invite', Colors.black, context),
             _buildListTile(Icons.help_outline, 'Help', Colors.black, context),
-            _buildListTile(Icons.privacy_tip_outlined, 'Privacy Policy', Colors.black, context),
-            _buildListTile(Icons.logout_outlined, 'Logout', Colors.red, context),
+            _buildListTile(Icons.privacy_tip_outlined, 'Privacy Policy',
+                Colors.black, context),
+            _buildListTile(
+                Icons.logout_outlined, 'Logout', Colors.red, context),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildListTile(IconData icon, String title, Color iconColor, BuildContext context) {
+  Widget _buildListTile(
+      IconData icon, String title, Color iconColor, BuildContext context) {
     return Card(
       color: Colors.white,
       margin: EdgeInsets.symmetric(vertical: 2),
@@ -180,7 +215,8 @@ class Profile extends StatelessWidget {
   }
 
   void _showLogoutDialog(BuildContext context) {
-    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    final profileProvider =
+        Provider.of<ProfileProvider>(context, listen: false);
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -197,7 +233,8 @@ class Profile extends StatelessWidget {
             TextButton(
               onPressed: () {
                 profileProvider.updateLoginStatus(false);
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => login()));
+                Navigator.pushReplacement(
+                    context, MaterialPageRoute(builder: (context) => login()));
               },
               child: Text('Logout'),
             ),
