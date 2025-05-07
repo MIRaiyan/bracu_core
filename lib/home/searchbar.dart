@@ -36,7 +36,7 @@ class _Search_barState extends State<Search_bar> {
   @override
   Widget build(BuildContext context) {
     // final allCourseProvider = Provider.of<AllCourseProvider>(context);
-    // List<AllCourse> filteredCourses = allCourseProvider.courses
+    // List<AllCourse> filteredCourses = allCourseProvider.resources
     //     .where((course) =>
     // course.title.toLowerCase().contains(searchQuery.toLowerCase()) ||
     //     course.instructorName

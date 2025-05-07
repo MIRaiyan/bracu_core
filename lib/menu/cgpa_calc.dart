@@ -40,12 +40,12 @@ class _CgpaCalculatorScreenState extends State<CgpaCalculatorScreen> {
   // Course GPA list
   final List<double> courseGpa = [];
 
-  // Number of courses to calculate
+  // Number of resources to calculate
   int numberOfCourses = 3;
 
   // Controllers for course grades
   final List<TextEditingController> gradeControllers = List.generate(
-    5, // Maximum 5 courses
+    5, // Maximum 5 resources
     (index) => TextEditingController(),
   );
 
@@ -159,11 +159,11 @@ class _CgpaCalculatorScreenState extends State<CgpaCalculatorScreen> {
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter the number of courses completed';
+                    return 'Please enter the number of resources completed';
                   }
                   int? courses = int.tryParse(value);
                   if (courses == null || courses < 0) {
-                    return 'Number of courses must be a positive number';
+                    return 'Number of resources must be a positive number';
                   }
                   return null;
                 },
@@ -176,7 +176,7 @@ class _CgpaCalculatorScreenState extends State<CgpaCalculatorScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Number of courses:',
+                    'Number of resources:',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   DropdownButton<int>(

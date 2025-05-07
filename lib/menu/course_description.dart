@@ -119,7 +119,7 @@ class _CoursePageState extends State<CoursePage> {
           const Icon(Icons.error, color: Colors.red, size: 50),
           const SizedBox(height: 10),
           const Text(
-            'Failed to load courses. Please try again.',
+            'Failed to load resources. Please try again.',
             style: TextStyle(fontSize: 16),
           ),
           const SizedBox(height: 20),

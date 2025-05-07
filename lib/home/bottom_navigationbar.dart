@@ -1,12 +1,17 @@
-import 'package:bracu_core/courses/course.dart';
+import 'package:bracu_core/resources/course_details.dart';
 import 'package:bracu_core/menu/menu.dart';
 import 'package:bracu_core/profile/profile.dart';
+import 'package:bracu_core/resources/course_home.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:provider/provider.dart';
+import '../service/profile_provider.dart';
 import 'home_screen.dart';
 import 'searchbar.dart';
 
 class BottomNavBar extends StatefulWidget {
+  const BottomNavBar({Key? key}) : super(key: key);
+
   @override
   _BottomNavBarState createState() => _BottomNavBarState();
 }
@@ -14,12 +19,23 @@ class BottomNavBar extends StatefulWidget {
 class _BottomNavBarState extends State<BottomNavBar> {
   int _selectedIndex = 0;
 
-  final List<Widget> _widgetOptions = [
-    HomeScreen(),
-    Menu(),
-    Course(),
-    Profile(),
-  ];
+  late final List<Widget> _widgetOptions;
+
+  @override
+  void initState() {
+    super.initState();
+
+    //Initialize widget options using gsuite from ProfileProvider
+    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    //Assume profileData getter;
+    final gsuite = profileProvider.gsuite??'';
+    _widgetOptions=[
+      HomeScreen(),
+      Menu(),
+      SearchPage(gsuite: gsuite),
+      Profile(),
+    ];
+  }
 
   void _onTabChange(int index) {
     setState(() {
@@ -32,7 +48,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: _widgetOptions[_selectedIndex],
-
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,

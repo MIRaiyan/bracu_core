@@ -6,7 +6,7 @@ import 'package:bracu_core/menu/faculty_review.dart';
 import 'package:bracu_core/menu/st_consultation.dart';
 import 'package:bracu_core/profile/help_page.dart';
 import 'package:flutter/material.dart';
-
+import '../thesis/thesis_home.dart';
 import 'faculty_consultation.dart';
 
 class Menu extends StatefulWidget {
@@ -89,7 +89,7 @@ class _MenuState extends State<Menu> {
   void _handleTap(BuildContext context, String option) {
     final Map<String, VoidCallback> actions = {
       'CGPA Calculator': () => _navigateTo(context, const CgpaCalculatorScreen()),
-      'Thesis Finder': () => print('Navigate to Thesis Finder'),
+      'Thesis Finder': () => _navigateTo(context,  ThesisHome()),
       'AI Assistant': () => _navigateTo(context, const AIAssistantScreen()),
       'Course info': () => _navigateTo(context, const CoursePage()),
       'Faculty Review': () => _navigateTo(context, const FacultyReviewPage()),
