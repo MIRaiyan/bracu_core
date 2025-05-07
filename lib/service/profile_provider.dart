@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../profile/profile.dart';
-import '../profile/update.dart';
+import '../profile/update_profile.dart';
 
 class ProfileProvider with ChangeNotifier {
   String _firstName = '';
@@ -286,6 +286,40 @@ class ProfileProvider with ChangeNotifier {
       debugPrint('Error updating address: $e');
     }
   }
+
+  Future<bool> updatePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      final token = await loadAuthToken(); // your stored JWT
+      final url = Uri.parse('https://bracu-core-backend.vercel.app/api/user/update_password'); // adjust endpoint
+
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'currentPassword': currentPassword,
+          'newPassword': newPassword,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        debugPrint('Failed to update password: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      debugPrint('Error in updatePassword: $e');
+      return false;
+    }
+  }
+
+
 
   Future<bool> updateProfile({
     required String studentId,

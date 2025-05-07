@@ -2,7 +2,8 @@ import 'package:bracu_core/auth/login.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../service/profile_provider.dart';
-import 'update.dart';
+import 'update_profile.dart';
+import 'update_password.dart';
 
 class Profile extends StatelessWidget {
   const Profile({super.key});
@@ -98,6 +99,13 @@ class Profile extends StatelessWidget {
                         emergencyContactRelation: profileProvider.emergencyRelation,
                         emergencyContactPhoneNumber: profileProvider.emergencyPhoneNumber,
                       ),
+                    ),
+                  );
+                } else if (options[index] == 'Change Password') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const UpdatePasswordPage(),
                     ),
                   );
                 }
